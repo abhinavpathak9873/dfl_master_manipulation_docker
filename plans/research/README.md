@@ -7,8 +7,9 @@ Before adopting a ROS/vendor/model dependency, verify its current source,
 version, license, platform support, and local behavior. Record those facts in
 the packet or backend that uses it so they stay near the implementation.
 
-The previous broad dependency, Isaac ROS, and CaP-X audits were removed from the
-active plan. Their useful conclusions are preserved in the accepted direction:
+The focused dependency, Isaac ROS, and CaP-X notes remain supporting evidence.
+They do not override the toolbox principles or create architecture. Their useful
+conclusions are:
 
 - reuse upstream ROS/model implementations instead of wrapping them to rename
   calls;

@@ -1,198 +1,198 @@
-# Architecture audit of the superseded plan
+# Toolbox-first audit of the full roadmap
 
 Date: 2026-08-27
 
-This audit compares every former plan and work packet with the toolbox-first
-direction. Git history retains the old text; deleted packets are not hidden
-requirements.
+Status: applied to the active phase and work-packet files
 
-## Tests used
+## Audit boundary
 
-- **Task-script test:** what new concept appears in the representative task?
-- **Five-minute test:** what must a developer understand before trying an idea?
-- **Debugging test:** how many layers sit between a task call and its backend?
-- **Deletion test:** if the abstraction disappears, where does necessary
-  complexity reappear?
-- **Two-implementation test:** are there two real adapters, or only a predicted
-  seam?
+This is a surgical architecture audit, not a scope-reduction exercise. All
+eight phases and all 66 individual work packets remain. The robot, tool,
+simulator, manipulation, perception, ObjectDB, scanning, Docker, gateway, and
+qualification goals remain.
 
-Safety logic at the ROS, controller, vendor, and physical-hardware seams is not
-treated as bloat. Infrastructure is retained only when a concrete dependency or
-hardware placement requires it.
+The audit removes machinery that does not help a robotics developer assemble,
+modify, understand, or debug a task. It does not remove a capability because it
+is difficult, scheduled later, or exercised after the first vertical slice.
 
-## Main findings
+## Tests applied to every packet
 
-1. The old roadmap was horizontal and infrastructure-first. It required eight
-   phases and dozens of frozen contracts before a complete developer task.
-2. ObjectDB had become a runtime control plane: always-on server, leases, sole
-   writer, Git transactions, sync sidecar, health graph, and activation gates.
-   Runtime tasks only need local immutable files.
-3. Backend interchangeability had become a plugin platform with entry points,
-   pluginlib manifests, schemas, qualification states, and generated catalogues.
-   Source-controlled Python mappings are enough for the current team.
-4. Ordinary experiments were forced into ROS application packages with
-   lifecycle, run-manifest, and cleanup ceremony.
-5. Configuration and result/error designs tried to standardize future robots and
-   algorithms before the first vertical slice proved their common shape.
-6. The initial release matrix—three robots, four tools, two simulators, multiple
-   services, scanning, GUI, gateways, and release operations—optimized coverage
-   rather than iteration speed.
+- **Task-script test:** what becomes easier in the Python experiment?
+- **Five-minute test:** what new knowledge is required before trying an idea?
+- **Debugging test:** is the path from task call to backend and ROS/vendor API
+  obvious?
+- **Deletion test:** does deleting an abstraction lose a concrete capability?
+- **Reality test:** is a contract based on actual integrations or imagined
+  future ones?
+- **Docker test:** does a container boundary isolate a real dependency, GPU,
+  device, or host-placement problem, or merely imitate microservices?
 
-## Pseudocode resolution
+Safety at physical robot, controller, vendor, network-watchdog, and uncertain
+execution boundaries remains. Evidence that helps compare algorithms or qualify
+hardware remains. Generic infrastructure added only for theoretical robustness
+does not.
 
-The revised interface keeps the supplied sketch's shape:
+## Architecture changes applied across the plan
 
-- `dfl.Robot(...)`, composite `robot.arm/gripper/camera/base`, and ordinary
-  task control flow;
-- folder-local constructors such as
-  `dfl.perception.segmentation.create(backend="tensorrt.py", ...)`;
-- one easy-to-open implementation file per backend and one direct mapping
-  entry;
-- positional `Joints(...)` and `Pose(x, y, z, q=..., frame=...)` as well as
-  explicit sequence forms;
-- local object loading and locally transformed grasp anchors;
-- force-aware motion and useful gripper results where the selected hardware
-  truly supports them.
+1. Python task scripts remain the orchestration layer. Phase packets may add
+   helpers and adapters but not a workflow runtime or mandatory task graph.
+2. Docker/devcontainer and Compose remain required. Services correspond to
+   concrete incompatible environments or hardware placement, not Python class
+   boundaries.
+3. Backend extension uses direct source mappings near recognizable robotics
+   folders. Entry-point ecosystems, generated catalogues, universal manifests,
+   qualification registries, and dependency injection are removed.
+4. Task configuration stays in constructor arguments where useful. Files hold
+   shared hardware facts, calibration, driver settings, scenes, and large model
+   configuration. A global layered configuration framework is removed.
+5. ObjectDB runtime reads local files. Scanning and authoring remain a full
+   Dockerized companion workflow, but an ObjectDB server, Git sync process, and
+   lease service are not task-startup dependencies.
+6. Custom ROS IDL is introduced only for an actual cross-process exchange that
+   standard ROS types cannot express. Python-only values do not acquire ROS
+   infrastructure.
+7. Run records are useful, bounded debug evidence selected by the task or
+   qualification packet—not an always-on observability platform.
+8. A representative vertical slice informs the next interface, while the full
+   Picker 1, Picker 2, H2515, four-gripper, Gazebo, Genesis, and real-mode scope
+   remains scheduled.
 
-The common examples use named robotics inputs instead of one opaque
-`input=[...]` array, because `rgb=`, `depth=`, `mask=`, and `object=`
-remain readable when backend needs differ. A backend can still accept a list or
-expose a specialized call through its concrete implementation. Backends are
-constructed once rather than rerunning model initialization on every function
-call.
+## Full capability matrix retained
 
-## Core and research documents
+| Area | Required scope |
+|---|---|
+| Robots | Picker 1/M1013, Picker 2/M1013, H2515 |
+| Tools | VGC10 one cup, VGC10 four cups, VGP20, 2FG14 |
+| Modes | real, Gazebo, Genesis where support is honest |
+| Composite hardware | arm, mobile base on both Pickers, gripper, D455/camera, force feedback where available |
+| Manipulation | joint/pose/relative motion, Pilz, OMPL, visual servo, force-aware motion, concurrent Pickers |
+| Perception | D455 data, SAM2/TensorRT-style segmentation, FoundationPose, M3T, health/reseed, snapshots, benchmarks |
+| Grasping | object anchors, algorithmic grasps, local alignment, verification, bounded retry/recovery |
+| ObjectDB | file assets, legacy migration, grasp profiles, scanning, reconstruction, viewer, editor, annotation |
+| Operations | Docker, gateways, DDS/QoS/clock, commissioning, parity, real qualification, documentation, release |
 
-| Former document | Verdict | Revised treatment |
+## Phase 00 — foundation and simulation proof
+
+| Packet | Capability retained | Bloat removed or constrained |
 |---|---|---|
-| `toolbox_plan.md` | Rewrite | Toolbox-first baseline; task script is the controlling interface. |
-| `plans/overview.md` | Rewrite | Six task-ordered packets plus one independent ObjectDB authoring track. |
-| `plans/traceability.md` | Rewrite | Trace task-visible promises to a small owner and executable check. |
-| `decisions/000_global_architecture.md` | Rewrite | Remove deployment-first and service-first decisions; retain useful ROS visibility and safety facts. |
-| `research/00_source_inventory.md` | Condense | Keep local sources as evidence and record current drift without copying their architecture. |
-| `research/01_dependency_audit.md` | Replace | Keep dependency facts next to the packet that adopts the dependency; reverify changing facts then. |
-| `research/02_isaac_ros_jazzy_reuse.md` | Merge | Relevant SAM2/FoundationPose reuse guidance moves to the perception packet. |
-| `research/03_capx_agent_interface_audit.md` | Merge | Small examples, focused fixtures, and direct navigation become repository guidance; generated capability registries are dropped. |
-| `example_api.txt` | Rewrite and promote | Correct, executable-shaped canonical task referenced by plans, README, and agent guidance. |
+| README | Dockerized base, profiles, Gazebo, Genesis evidence gate, full simulator matrix | Phase is an implementation sequence, not a gate that blocks vertical task experiments. |
+| 01 container and Compose | Pinned Jazzy/devcontainer, GPU/device/mount profiles, reproducible commands | No service-per-module design, Compose task graph, or universal health framework. |
+| 02 workspace imports | Reproducible source pins and provenance for adopted dependencies | No central source-management platform; record only dependencies actually used. |
+| 03 Doosan Jazzy migration | M1013 and H2515 descriptions, drivers, control, MoveIt, emulator behavior | No wrapper hierarchy that obscures Doosan ROS packages. |
+| 04 robot/tool/scene profiles | Picker 1, Picker 2, H2515; four tools; cameras; scenes; three modes | Small readable profiles for shared facts, not a universal configuration schema. |
+| 05 Gazebo emulator | All declared robot/tool combinations on the primary simulator | One honest ROS/controller adapter; no simulator-specific task API. |
+| 06 Genesis bridge spike | Genesis support and explicit emulator evidence gate | Spike chooses the smallest workable bridge; it does not invent a simulation framework. |
+| 07 simulator contract | Common ROS behavior actually shared by Gazebo, Genesis, and real adapters | Extract after both simulators are exercised; do not predict a universal simulator ontology. |
+| 08 fixed task matrix | All 12 robot/tool selections in Gazebo and Genesis, with observable pass/fail evidence | Compact task-level checks replace release-platform ceremony. |
 
-## Former Phase 00 — foundation and simulation
+## Phase 01 — lightweight shared seams
 
-| Former packet | Verdict | Reason / destination |
+| Packet | Capability retained | Bloat removed or constrained |
 |---|---|---|
-| Phase README | Delete | Phase-wide infrastructure gate delayed all useful task work. |
-| 01 container and Compose | Defer and narrow | Add only the container needed by the Picker 1 Gazebo or perception adapter; no predeclared service fleet. |
-| 02 workspace imports | Merge | Pin and import a dependency inside the concrete backend packet that uses it. |
-| 03 Doosan Jazzy migration | Keep, reorder | Becomes part of [Picker 1 Gazebo](work_packets/03_picker1_gazebo.md) and later real mode. |
-| 04 robot/tool/scene profiles | Reduce | Keep small adapter-owned records for actual hardware facts; remove universal schemas and matrices. |
-| 05 Gazebo emulator | Keep, narrow | Prove Picker 1 plus one gripper and camera before other combinations. |
-| 06 Genesis bridge spike | Defer | No named task currently needs Genesis. |
-| 07 simulator contract | Delete as advance design | Extract shared behavior only after Gazebo and a second simulator both exist. |
-| 08 fixed task matrix | Replace | One representative task is the initial acceptance test; expand only to supported combinations. |
+| README | Small values, explicit ROS seams, direct backend maps, visible tasks, useful run evidence | No contract freeze before concrete integrations. |
+| 01 Python value types | `Pose`, `Joints`, and result fields needed by tasks | No global result envelope or speculative failure-code ontology. |
+| 02 ROS interfaces | Standard messages first; focused custom messages/actions only for proven cross-process gaps | No IDL for Python-local calls or imagined consumers. |
+| 03 configuration | Visible task arguments plus adapter-owned hardware/calibration/model files | No nine-layer resolver, global provenance tree, or config service. |
+| 04 backend selection | Stable names mapped directly to implementation files/classes | No entry points, plugin manifests, discovery daemon, generated registry, or qualification state machine. |
+| 05 namespaces, TF, units, time | Namespaced robots, REP-103 units, explicit frames, timestamps, freshness checks | Kept at ROS seams; no parallel time/frame abstraction. |
+| 06 task convention | Ordinary `tasks/*.py`, with ROS packaging only when actually required | No mandatory application package, launch hierarchy, or workflow manifest. |
+| 07 run records | Optional task/qualification metadata, focused metrics, bounded failure artifacts | No mandatory event bus, recorder service, or observability platform. |
 
-## Former Phase 01 — shared contracts
+## Phase 02 — manipulation API and control
 
-| Former packet | Verdict | Reason / destination |
+| Packet | Capability retained | Bloat removed or constrained |
 |---|---|---|
-| Phase README | Delete | Global contract freeze predicted interfaces before integrations existed. |
-| 01 Python value types | Keep, reduce | Initial `Pose`, `Joints`, and useful results only; no global plan/track/run ontology. |
-| 02 ROS interfaces | Defer | Standard ROS types and adapter-local conversions first; custom IDL requires a concrete cross-process gap. |
-| 03 config resolution | Replace | Constructor arguments plus small adapter-owned hardware/config files; no nine-layer resolver or provenance tree. |
-| 04 plugin discovery | Replace | Direct dictionaries beside implementation files; no entry points, manifests, pluginlib catalogue, or qualification registry. |
-| 05 namespaces, TF, time | Keep at ROS seam | Picker adapter owns its names, TF, freshness, and QoS checks; pure values remain ROS-free. |
-| 06 task package convention | Reverse default | Ordinary `tasks/*.py`; create a ROS package only when the task itself must be a ROS executable. |
-| 07 run records | Defer and make optional | Add task/backend debug artifacts when observed failures need them; no mandatory event platform. |
+| README | Full arm/base/tool/concurrent-robot scope and visible task recovery | No runtime lease, global lifecycle coordinator, or hidden manipulation procedure. |
+| 01 robot lifecycle | `bringup()`, explicit attach, readiness, signal cleanup, ownership of started processes | No ObjectDB dependency, Compose control plane, session service, or generalized ownership tokens. |
+| 02 motion | `move_joints`, `move_pose`, relative helpers, `stop`, and public plan/execute where useful | One small arm API; no universal motion request/result framework. |
+| 03 Pilz | PTP, LIN, CIRC and measured stop/execution behavior | Direct MoveIt/Pilz adapter, not a planner plugin platform. |
+| 04 OMPL/fallbacks | Collision-aware OMPL and explicit pre-execution fallback attempts | Task-visible choices; no automated planner policy engine. |
+| 05 visual servo | Position/velocity servo primitives, target freshness, bounds, zero-on-loss | State belongs to the servo object/task; no generalized behavior runtime. |
+| 06 gripper | Shared open/close/stop/status with useful success/width/force data | Common minimum plus backend-specific methods; no exhaustive capability negotiation. |
+| 07 VGC10 profiles | One-cup and four-cup TCP, geometry, IO/control, simulation | Both profiles remain; shared code only where the hardware behavior truly repeats. |
+| 08 VGP20 | Real and simulated VGP20 behavior and status | Direct tool backend, not another service layer. |
+| 09 2FG14 | Width/force control, result interpretation, descriptions, simulation | Object expectations remain in task/object grasp data, not a driver policy engine. |
+| 10 base velocity | Bounded Picker base velocity, deadman/stop, namespace and odometry | Small `robot.base` API over the existing driver; no navigation framework. |
+| 11 concurrent robots | Namespaced Picker 1 and Picker 2 tasks and resource-safe lab operation | Two ordinary robot objects and ROS namespaces first; no scheduler or resource manager. |
+| 12 acceptance | Complete matrix-focused manipulation checks and hardware evidence | Acceptance validates capabilities without forcing a deployment platform into daily experiments. |
 
-## Former Phase 02 — manipulation
+## Phase 03 — object assets, grasps, and planning scene
 
-| Former packet | Verdict | Reason / destination |
+| Packet | Capability retained | Bloat removed or constrained |
 |---|---|---|
-| Phase README | Delete | Replaced by one vertical manipulation slice. |
-| 01 robot lifecycle | Keep, simplify | `bringup()` may own launch and cleanup; remove ObjectDB leases, global ownership tokens, and mandatory recorder coupling. |
-| 02 motion contract | Keep, simplify | Start with `move_joints`, `move_pose`, relative helpers, and `stop`; add split plan/execute when preview is used. |
-| 03 Pilz motion | Keep concrete | First motion implementation in the Picker adapter; retain proven trajectory and stop checks. |
-| 04 OMPL and fallbacks | Defer | Add when a named task needs collision-aware planning or a second explicit plan attempt. |
-| 05 visual servo | Defer extraction | First express alignment/control in the grasp task; extract shared logic only after repetition. |
-| 06 gripper contract | Keep, reduce | Shared `open`, `close`, `stop`, and useful result fields; tool-specific parameters remain allowed. |
-| 07 VGC10 profiles | Keep one first | Implement only the mounted/selected VGC10 geometry used by the reference task. |
-| 08 VGP20 | Defer | Promote with a concrete mounted or simulated task. |
-| 09 2FG14 | Defer | Promote with a concrete task; do not copy object settings into the driver. |
-| 10 base velocity | Defer | Composite `robot.base` remains a planned slot; implement when a task moves the base. |
-| 11 concurrent robots | Defer | Two ordinary `Robot` objects first; shared-resource machinery only after a real collision. |
-| 12 manipulation acceptance | Replace | [Reference grasp task](work_packets/05_reference_grasp_task.md) is the end-to-end acceptance. |
+| README | File-first assets, revisions where useful, legacy migration, grasps, scene use | Runtime ObjectDB server and sole-writer control-plane role removed. |
+| 01 object schema | Small extensible object record: ID, units/frame, mesh, models, anchors, metadata | Optional fields grow from real consumers; no universal asset ontology. |
+| 02 file store/index | Normal object directories, immutable approved revisions if needed, rebuildable index | No runtime activation journal, nested transaction coordinator, or mandatory database. |
+| 03 legacy migration | Four approved legacy objects/revisions and an auditable converter | One focused migration tool; rejected history can stay read-only without a compatibility framework. |
+| 04 grasp profiles | Object-frame anchors and explicit optional tool-specific data | Anchors load with the asset and transform locally; no service lookup. |
+| 05 loader and authoring CLI | Local `objectdb.load`, validate/inspect/create-revision commands | No mandatory runtime service, leases, HTTP dependency, or network resolution. |
+| 06 scene/MoveIt sync | Explicitly add/update/remove loaded assets and tracked poses in the planning scene | Motion side owns scene state; ObjectDB is not a live scene authority. |
+| 07 contract tests | Loader, paths, hashes where used, transforms, profiles, scene fixtures | Focused file/robotics tests instead of service-topology tests. |
 
-## Former Phase 03 — ObjectDB and scene
+## Phase 04 — perception and tracking
 
-| Former packet | Verdict | Reason / destination |
+| Packet | Capability retained | Bloat removed or constrained |
 |---|---|---|
-| Phase README | Delete | ObjectDB is no longer a mandatory runtime phase. |
-| 01 object JSON schema | Keep, reduce | Small extensible `object.json` with optional paths, models, anchors, and metadata. |
-| 02 file store and index | Replace | Direct directories and files; no SQLite cache, locks, activation journal, nested Git transaction, or sync outbox in runtime. |
-| 03 legacy migration | Keep on demand | One readable migration script after source data and the exercised file format are available. |
-| 04 grasp profiles | Reduce | Anchors live with the object and transform locally; tool-specific metadata stays optional and explicit. |
-| 05 object service and CLI | Delete runtime service | `objectdb.load` is local. A CLI may later help author/validate files but is not a server prerequisite. |
-| 06 scene and MoveIt sync | Defer to motion task | Add only the scene operations required by the working grasp task. |
-| 07 object contract tests | Keep, reduce | Loader, path safety, asset resolution, and anchor-transform tests at the local interface. |
+| README | D455, SAM2, FoundationPose, M3T, health/reseed, snapshots, benchmarks | Backends remain ordinary objects/adapters, not managed pipeline components. |
+| 01 D455 dataset | Recorded RGB-D, calibration, frames, object/scene labels and splits | Small reusable evidence set; no dataset platform. |
+| 02 SAM2 | Dockerized accelerated backend with clear model/prompt/mask API | Direct mapping and thin ROS adapter where Isaac ROS requires it; no plugin infrastructure. |
+| 03 FoundationPose | Explicit RGB/depth/mask/mesh pose estimation and reseeding | Backend-specific features remain accessible; no artificial generic input envelope. |
+| 04 tracking | Explicit `initialize`, `update`, `reset`, pose/age/health state | State stays in `Tracker`; no general state-management framework. |
+| 05 M3T | Native/ROS integration, object meshes, seeds, measured rate | Isolation only for actual build/process needs. |
+| 06 reseed/health | Clear lost/stale policy and explicit FoundationPose reseed | Tracker/task logic, not a generalized recovery engine. |
+| 07 snapshots | Timestamped multi-object view for real scene consumers | Add a small value/helper; do not build a scene service. |
+| 08 benchmarks | Accuracy, latency, stability, memory, and long-run checks for named stack | Qualification evidence is backend-scoped, not a mandatory runtime platform. |
 
-## Former Phase 04 — perception
+## Phase 05 — local alignment and closed-loop grasping
 
-| Former packet | Verdict | Reason / destination |
+| Packet | Capability retained | Bloat removed or constrained |
 |---|---|---|
-| Phase README | Delete | One end-to-end perception slice replaces a pre-frozen graph. |
-| 01 D455 dataset | Defer to backend evidence | Create the smallest recorded fixture needed to develop/regress the selected algorithms. |
-| 02 SAM2 segmentation | Keep as optional backend | Direct `sam2.py` adapter only if selected by a task. TensorRT may be first if the tray asset already provides it. |
-| 03 FoundationPose | Keep | Concrete pose backend with explicit RGB/depth/mask/object inputs. |
-| 04 tracking contract | Keep, small | Explicit state lives in `Tracker`; common `initialize/update/reset` only after M3T exercises it. |
-| 05 M3T ROS adapter | Keep | Native/ROS complexity stays inside `tracking/m3t.py` and its integration support. |
-| 06 reseed and track health | Merge into tracker/task | Do not create a generalized recovery state machine before the task needs reseeding. |
-| 07 scene snapshots | Delete initially | The task and MoveIt adapter can consume current typed poses directly; add snapshots for a demonstrated multi-object consumer. |
-| 08 perception benchmarks | Keep proportional | Record task-relevant accuracy, latency, and stability; two-hour endurance is a backend qualification tool, not a toolbox-wide gate. |
+| README | Existing alignment behavior, replaceable algorithms, explicit task stages, acceptance | Task Python owns sequence and recovery. |
+| 01 alignment | `LocalAlignment.compute(...)` returns correction/health and never moves hardware | Small capability interface with backend-specific access. |
+| 02 legacy characterization | Preserve measured geometry, conventions, thresholds, and safety behavior | Copy behavior and fixtures, not old topology or accidental abstractions. |
+| 03 reference/depth alignment | Reference, mask, depth, XY/RPY correction backend | Direct implementation with inspectable debug artifacts. |
+| 04 bounded visual servo | Apply corrections with explicit limits, freshness, convergence, and stop | Ordinary bounded control loop or small helper, not a behavior framework. |
+| 05 grasp verification | Suction/width/force/lift evidence and useful result | Tool-specific checks remain explicit; no verification policy plugin system. |
+| 06 retry/recovery | Named retryable stages, uncertain-state stop, task examples | `if`/`while`/`try` remain the mechanism; no state-machine runtime. |
+| 07 acceptance | Four objects, supported tools, simulator and real evidence as declared | Trials qualify named combinations without hiding task logic. |
 
-## Former Phase 05 — alignment and grasping
+## Phase 06 — ObjectDB scanning and authoring companion
 
-| Former packet | Verdict | Reason / destination |
+| Packet | Capability retained | Bloat removed or constrained |
 |---|---|---|
-| Phase README | Merge | Goals become the [reference grasp task](work_packets/05_reference_grasp_task.md). |
-| 01 alignment contract | Keep, reduce | `LocalAlignment.compute(...)` returns a correction and never moves the robot. |
-| 02 legacy characterization | Keep | Preserve proven geometry and safety behavior without copying the old module topology. |
-| 03 reference/depth alignment | Keep | Direct backend implementation and recorded fixtures. |
-| 04 bounded visual servo | Merge into visible task/helper | Start with ordinary loop/control flow; extract a helper only when repeated. |
-| 05 grasp verification | Merge into gripper result/task | Use actual tool feedback and optional lift check; no policy plugin system initially. |
-| 06 retry and recovery | Delete framework | Ordinary targeted `try`, `if`, and `while` in the task; uncertain state still stops clearly. |
-| 07 grasp acceptance | Keep, narrow | One tray task in Gazebo, then supervised real trials for the actual installed combination. |
+| README | Full scan-to-approved-asset workflow in Docker, separate from task runtime | Companion tool, not an always-on robotics control plane. |
+| 01 scan session | Explicit stages, evidence, resume review, rigid/opaque scope | Local authoring state; no distributed workflow engine or runtime task lease service. |
+| 02 view capture | Picker 1/D455 scan poses, masks, calibration, operator start and safe stop | Reuse robot/camera primitives; no duplicate motion API. |
+| 03 reconstruction | On-demand dependency-isolated worker, metric mesh, quality report | Separate container is justified by dependencies; orchestration stays a direct job call. |
+| 04 revision registration | Reviewed output becomes a new validated file revision | Atomic local write; Git commit/backup optional authoring policy, never task startup. |
+| 05 viewer | Local mesh/reference/grasp/quality inspection | UI reads normal files through a small authoring API only where needed. |
+| 06 editor | Validated edits, preview, atomic save/new revision | Single-user local workflow; no multi-user transaction platform. |
+| 07 annotation/test | Create tool-aware anchors, preview transforms, run explicit robot tests | Uses the same toolbox primitives and file format as tasks. |
+| 08 acceptance | One full physical-object-to-task workflow plus failure/recovery checks | Validate user workflow rather than container/service topology. |
 
-## Former Phase 06 — scanning and GUI
+## Phase 07 — deployment support and release evidence
 
-| Former packet | Verdict | Reason / destination |
+| Packet | Capability retained | Bloat removed or constrained |
 |---|---|---|
-| Phase README | Move out of runtime roadmap | ObjectDB is a companion authoring track. |
-| 01 scan contract | Defer | Define session state only when implementing the authoring workflow. |
-| 02 view capture | Defer | Use the toolbox's ordinary robot and camera objects from a scan script. |
-| 03 reconstruction and quality | Defer | A tool/function may run in a separate environment if its dependencies require it. |
-| 04 revision registration | Replace | Author a new object directory/revision; no runtime activation lease or Git transaction requirement. |
-| 05 object viewer | Defer | Optional local companion once file inspection becomes painful. |
-| 06 atomic editor | Defer | Files plus validation first; GUI transaction design follows observed editing problems. |
-| 07 grasp annotation and test | Keep as companion goal | Write anchors into the object asset and test them through the same task primitives. |
-| 08 scan GUI acceptance | Defer | Replace the infrastructure matrix with one object-from-scan-to-task workflow when built. |
+| README | Gateways, LAN/DDS, Compose, safe recovery, commissioning, parity, qualification, docs, releases | Operations support robotics work; it does not redefine the toolbox as a platform. |
+| 01 gateways | NUC/Jetson device-side ROS drivers, state relay, heartbeat/watchdog where physically required | No generic gateway framework or duplicated desktop intelligence. |
+| 02 DDS/QoS/clock | Tested discovery, topic QoS, bandwidth, host identity, and clock sync | Use ROS/DDS mechanisms and documented commands; no network control plane. |
+| 03 desktop Compose | Profiles for core, perception, Genesis, ObjectDB authoring, scan worker, and gateways | Compose starts dependency groups; Python remains task orchestration; no mandatory ObjectDB/sync services. |
+| 04 recovery | Safe stop, component restart behavior, revalidation, explicit fresh task/run | No automatic motion resume or generalized session/epoch/lease state machine. |
+| 05 commissioning | Identity, mounts, TCPs, calibration, limits, network, force/tool behavior | Plain records and executable checks, not a configuration product. |
+| 06 parity | Shared operations compared across Gazebo and Genesis for full declared matrix | Report honest differences instead of forcing false uniformity. |
+| 07 real qualification | Supervised trials, metrics, failures, unsafe-event criteria for installed combinations | Evidence belongs to named tasks/adapters; it does not block unrelated experiments. |
+| 08 documentation | Architecture map, task examples, backend locations, Docker commands, diagnostics, limitations | Handwritten and source-adjacent; no generated portal or manifest registry. |
+| 09 upgrades/release | Pinned dependency updates, affected tests, rollback, reproducible images | Manual internal release procedure; no deployment pipeline is created. |
 
-## Former Phase 07 — deployment and release
+## Result
 
-| Former packet | Verdict | Reason / destination |
-|---|---|---|
-| Phase README | Delete | Deployment/release is supporting work, not the product roadmap. |
-| 01 gateway services | Defer to physical placement | Keep ROS-visible drivers and local watchdogs only for devices that require a gateway. |
-| 02 DDS, QoS, and clock | Keep as deployment checklist | Configure and test the actual LAN; no framework. |
-| 03 desktop Compose | Replace | Containers launch incompatible dependencies; Python task remains the orchestrator and ObjectDB is not always-on. |
-| 04 session recovery | Reduce | Backends stop safely and return explicit errors; no generalized session/epoch/lease state machine. |
-| 05 hardware commissioning | Keep | Real adapters require identity, calibration, limits, stop, and supervised test evidence. |
-| 06 simulator parity | Defer | Compare only implemented shared operations after a second simulator exists. |
-| 07 real qualification | Keep proportional | Run declared trials for the actual task; it does not block unrelated experimental toolbox use. |
-| 08 module documentation | Keep, simplify | Handwritten README, canonical task, backend file location, and focused tests; no manifest-generated index. |
-| 09 dependency upgrades and release | Defer | Pin adopted dependencies and rerun affected tasks when an internal release is actually cut. |
+The active roadmap still contains 8 phases, 8 phase READMEs, and 66 individual
+work packets. Each packet remains independently actionable and now states its
+task-script payoff and smallest sufficient design. Docker, the original
+repository layout, every robot, all four grippers, both simulators, real mode,
+and the complete robotics/ObjectDB scope are retained.
 
-## Resulting cut
-
-The active plan shrinks from 66 work packets across eight phase READMEs and
-approximately 5,600 lines of planning material to seven focused packets, one
-backlog, one traceability table, and this audit. More importantly, the first
-useful task moves from the end of a multi-phase contract program to the center
-of each implementation decision.
+The reduction is architectural: fewer mandatory layers, registries, services,
+leases, global schemas, and orchestration concepts between a task script and the
+robotics code it needs.
