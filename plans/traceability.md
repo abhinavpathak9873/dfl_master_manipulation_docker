@@ -9,7 +9,7 @@ Each requirement has one primary work packet. Other packets may consume its outp
 | Reproducible Jazzy container and Compose services | Phase 00 / `01_container_and_compose.md` | All phases |
 | ObjectDB, scan-worker, and Git-sync image/mount isolation | Phase 00 / `01_container_and_compose.md` | Phases 03, 06, 07 |
 | Pinned source workspace and existing package integration | Phase 00 / `02_workspace_imports.md` | Phases 01, 02, 07 |
-| Exact `dff_mobile_manipulation_docker` repository convention | Phase 00 / `01_container_and_compose.md`, `02_workspace_imports.md` | Phases 01, 07 and release structure gate |
+| `dff_mobile_manipulation_docker`-compatible directory pattern | Phase 00 / `01_container_and_compose.md`, `02_workspace_imports.md` | Phases 01, 07 and release structure gate |
 | Doosan Jazzy M1013/H2515 migration | Phase 00 / `03_doosan_jazzy_migration.md` | Phases 02, 07 |
 | Independent robot, tool, scene, mode, and pipeline selection | Phase 00 / `04_robot_tool_scene_profiles.md` | Phases 01, 02, 03, 07 |
 | Official-emulator Gazebo path | Phase 00 / `05_gazebo_emulator.md` | Phases 02, 07 |

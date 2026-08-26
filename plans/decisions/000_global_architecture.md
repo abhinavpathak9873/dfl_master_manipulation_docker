@@ -9,7 +9,7 @@ These decisions came from the global grill. Phase and module plans must not ask 
 
 - Build a deployment-focused ROS 2 Jazzy toolbox, not a separate robotics framework.
 - Keep ordinary ROS nodes, launch files, parameters, TF, topics, services, actions, MoveIt, RViz, rosbag, and vendor drivers visible.
-- Follow the tracked repository layout of `dff_mobile_manipulation_docker`: Compose and the ROS workspace live under `.devcontainer/`, ROS packages live directly under `.devcontainer/src/`, and Docker/build/deployment support lives under `scripts/`.
+- Follow the directory pattern of `dff_mobile_manipulation_docker`: Compose and the ROS workspace live under `.devcontainer/`, ROS packages live directly under `.devcontainer/src/`, and Docker/build/deployment support lives under `scripts/`. Multiple Compose files, Dockerfiles, and project-specific durable mount directories are allowed when required by the accepted service boundaries.
 - Keep task packages outside the toolbox as sibling packages under `.devcontainer/src/<task_name>`. Do not add an intermediate `tasks/` directory.
 - Keep `object_db` separate from toolbox code.
 - Exclude Nav2, coordinated base-arm planning, cuMotion, open-world perception, old-import compatibility, a multi-user GUI, and automatic task resume from v1.

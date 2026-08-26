@@ -35,7 +35,7 @@ Produce enough evidence to reproduce and diagnose each task without recording fu
 
 - `RunRef` Python value
 - Run manifest JSON and event JSONL
-- Artifact directory under the configured external run root, conventionally `<DFL_RUNTIME_ROOT>/logs/runs/<run_id>`; it is not a tracked root-level repository directory
+- Artifact directory under `logs/runs/<run_id>`, with an environment override available when the durable run root lives elsewhere
 - Diagnostics hooks consumed by toolbox and integration packages
 
 ## Boundaries

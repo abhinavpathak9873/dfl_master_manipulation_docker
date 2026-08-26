@@ -32,7 +32,7 @@ Publish compact documentation that lets a developer or agent find one capability
 6. Document extension work separately: implement contract, declare plugin, add schema, pass shared tests, add minimal doc, and qualify modes.
 7. Add troubleshooting keyed by stable error code and health state, pointing to run artifacts and owning module.
 8. Document the one-command scan flow, Picker 1 station boundary, explicit start/resume rules, staging quota/cleanup, activation block, Git/LFS inclusion policy, backup status, and ObjectDB-outage behavior.
-9. Document the inherited repository convention explicitly: `.devcontainer/src` is the host ROS workspace, it mounts at `/root/ros2_ws/src`, Compose lives under `.devcontainer`, infrastructure lives under `scripts`, and task packages are direct workspace children. Keep the root README's tree and commands consistent with `dff_mobile_manipulation_docker`.
+9. Document the inherited repository pattern explicitly: `.devcontainer/src` is the host ROS workspace, it mounts at `/root/ros2_ws/src`, all Compose files live under `.devcontainer`, infrastructure lives under `scripts`, and task packages are direct workspace children. Document project-specific durable directories and every additional Compose file rather than implying that the repository must contain only the reference repository's files.
 
 ## Interfaces and data
 
@@ -58,7 +58,7 @@ Publish compact documentation that lets a developer or agent find one capability
 - Every public call maps to ROS and config details.
 - Every installed plugin has qualification and limitation data.
 - All links and examples validate.
-- The documented tree matches a generated structure check and contains no root-level `src/`, `docker/`, `compose.yaml`, `tasks/`, `config/`, `calibration/`, `scenes/`, `models/`, `logs/`, or `data/` layout.
+- The documented tree matches a generated structure check: ROS source is under `.devcontainer/src`, Compose files are under `.devcontainer`, Dockerfiles and operational scripts are under `scripts`, and additional project directories have documented ownership.
 - Agent assignment instructions point only to required context.
 
 ## Parallel work

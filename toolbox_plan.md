@@ -30,7 +30,7 @@ The mobile base exposes bounded `cmd_vel` control for positioning and tests. It 
 
 ## Repository shape
 
-The repository follows the host and container layout of `dff_mobile_manipulation_docker`. This is a compatibility constraint, not a naming suggestion. Compose and the live ROS source workspace live under `.devcontainer/`; Dockerfiles, environment setup, build, pull, deploy, entrypoint, DDS, and clock scripts live under `scripts/`; VS Code configuration lives under `.vscode/`. The live host path `.devcontainer/src` mounts at `/root/ros2_ws/src` in development containers. Do not introduce root-level `src/`, `docker/`, `compose.yaml`, `tasks/`, `config/`, `calibration/`, `scenes/`, `models/`, `logs/`, or `data/` directories in the implemented layout.
+The repository follows the directory pattern of `dff_mobile_manipulation_docker` without copying its single-container limitation. Compose definitions and the live ROS source workspace live under `.devcontainer/`; Dockerfiles, environment setup, build, pull, deploy, entrypoint, DDS, and clock scripts live under `scripts/`; VS Code configuration lives under `.vscode/`. The live host path `.devcontainer/src` mounts at `/root/ros2_ws/src` in development containers. This project may add Compose files, Dockerfiles, scripts, and durable runtime directories required by its wider service set, provided those additions stay within these directory roles. Do not introduce competing root-level source, Compose, or Dockerfile layouts.
 
 The planned tracked layout is:
 
@@ -39,9 +39,14 @@ dfl_master_manipulation_docker/
 ├── .devcontainer/
 │   ├── devcontainer.json
 │   ├── docker-compose-dfl-master-manipulation-ros2-jazzy.yml
+│   ├── docker-compose-gateway-ros2-jazzy.yml
 │   └── src/
 ├── .vscode/
 ├── scripts/
+├── calibration/
+├── data/
+├── logs/
+├── models/
 ├── plans/
 ├── .dockerignore
 ├── .gitignore
@@ -51,7 +56,7 @@ dfl_master_manipulation_docker/
 └── toolbox_plan.md
 ```
 
-`plans/` and `toolbox_plan.md` are retained planning artifacts specific to this repository. Package-owned configuration, calibration, scenes, launch files, tests, and documentation stay inside their owning package beneath `.devcontainer/src/`, as they do in the reference repository. Runtime object data, scan staging, models, caches, and run logs are mounted from configurable durable roots and are not new tracked top-level source directories.
+`plans/` and `toolbox_plan.md` are retained planning artifacts specific to this repository. Package-owned configuration, scenes, launch files, tests, and documentation stay inside their owning package beneath `.devcontainer/src/`, as they do in the reference repository. The project-level `calibration/`, `data/`, `logs/`, and `models/` directories are durable mount roots required by the multi-service design; generated or sensitive contents remain ignored as appropriate.
 
 The planned ROS source layout is:
 

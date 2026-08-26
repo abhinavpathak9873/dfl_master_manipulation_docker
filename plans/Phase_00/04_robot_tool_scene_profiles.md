@@ -27,7 +27,7 @@ Record the physical composition and stable IDs that task code will select. Separ
 3. Separate VGC10 one-cup and four-cup geometry and grasp behavior. Add VGP20 and 2FG14 without aliasing them to the VGC10 driver.
 4. Record D455 serial, stream profiles, optical frames, parent mount, calibration provenance, and which host owns the driver.
 5. Define `.devcontainer/src/dfl_manipulation_toolbox/scenes/<scene_id>/scene.yaml` plus assets for static geometry, expected frames, simulator world settings, and default object placements.
-6. Move the provisional `calibration/picker1_d455.yaml` sentinel into the owning package at `.devcontainer/src/dfl_manipulation_toolbox/config/calibration/picker1_d455.yaml`, then remove the root-level `calibration/` directory. Keep future calibration records in an owning package or external commissioned-data mount, never in a new top-level repository directory.
+6. Keep the provisional `calibration/picker1_d455.yaml` sentinel and future commissioned calibration records under the project-level `calibration/` durable mount. Package defaults may live with the owning package, but hardware-derived calibration must not be baked into a package or image.
 7. Mark every combination as `supported_sim`, `commissioned_real`, `unsupported`, or `unverified`. Simulation support is required for all twelve robot/tool selections.
 8. Provide a profile-inspection command or generated report that Phase 01 can consume when implementing validation.
 
