@@ -24,7 +24,7 @@ Implement the nested `dfl_object_db` data repository with immutable approved rev
 
 ## Work
 
-1. Clone the private `dfl_object_db` repository at `data/object_db/`, independent of the parent toolbox source history. Store each object under `objects/<object_id>/revisions/<revision_id>/` with its mesh, same-base JSON, collision assets, compact local references, previews, and revision manifest.
+1. Clone the private `dfl_object_db` repository at the configured external ObjectDB durable root, independent of the parent toolbox source history. Do not add a tracked root-level `data/` directory. Store each object under `objects/<object_id>/revisions/<revision_id>/` with its mesh, same-base JSON, collision assets, compact local references, previews, and revision manifest.
 2. Keep `objects/<object_id>/current.json` as a small atomic pointer containing object ID, active revision ID, and record hash. It does not duplicate the object record.
 3. Write object edits to a private staging directory, validate every file and hash, fsync files and parent directories, then atomically rename the completed revision and replace the current pointer under one transaction journal.
 4. Approved revisions are immutable. Editing creates a new revision. Draft staging may be deleted only through the service/CLI after verifying it is not active.
@@ -33,7 +33,7 @@ Implement the nested `dfl_object_db` data repository with immutable approved rev
 7. Treat local Git commit as part of activation. Stage only the approved object bundle and active pointer. If commit fails, restore the prior pointer before releasing the lock and leave the new revision approved but inactive. Startup recovery resolves an unfinished transaction before serving reads.
 8. Write a sync-outbox record for each committed HEAD. Remote push is outside the canonical transaction; push status records success, last attempt, error, and oldest unpushed commit without changing object content.
 9. Build SQLite search tables from canonical files for names, statuses, tags, gripper compatibility, and qualification. Cache deletion and rebuild must not change canonical state.
-10. Keep raw scan sessions under `data/scan_staging/`, outside Git. Enforce a configured byte/session quota, report the high-water mark, and block new sessions until the operator exports or deletes data through the service.
+10. Keep raw scan sessions under the configured external scan-staging root, outside Git. Enforce a configured byte/session quota, report the high-water mark, and block new sessions until the operator exports or deletes data through the service.
 11. Provide verify, rebuild-index, export, clone/restore-check, staging-usage, and explicit cleanup commands. A GitHub backup is accepted only after a clean clone, Git LFS fetch, and full hash/pointer validation.
 
 ## Interfaces and data

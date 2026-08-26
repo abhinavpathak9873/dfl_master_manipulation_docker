@@ -14,7 +14,7 @@ V1 proves the complete workflow on four approved legacy objects. The object form
 
 ## Product boundary
 
-This project adds a small task API and typed contracts around standard ROS 2 components. It does not introduce a new runtime framework. Task packages remain ordinary ROS packages under `src/tasks/<task_name>`. Object data remains separate under `object_db`. Heavy integrations for Isaac ROS, M3T, and Genesis receive their own dependency-focused packages so their GPU, native, and Python environments do not leak into the core package.
+This project adds a small task API and typed contracts around standard ROS 2 components. It does not introduce a new runtime framework. Task packages remain ordinary ROS packages directly under `.devcontainer/src/<task_name>`, matching `dff_mobile_manipulation_docker`; there is no intermediate `tasks/` directory. Object data remains separate from source. Heavy integrations for Isaac ROS, M3T, and Genesis receive their own dependency-focused packages so their GPU, native, and Python environments do not leak into the core package.
 
 V1 excludes:
 
@@ -30,10 +30,33 @@ The mobile base exposes bounded `cmd_vel` control for positioning and tests. It 
 
 ## Repository shape
 
-The project root owns Docker and Compose definitions, devcontainer configuration, shared configuration, scripts, durable mounts, logs, models, calibration, object data, and a normal ROS 2 source workspace. The planned source layout is:
+The repository follows the host and container layout of `dff_mobile_manipulation_docker`. This is a compatibility constraint, not a naming suggestion. Compose and the live ROS source workspace live under `.devcontainer/`; Dockerfiles, environment setup, build, pull, deploy, entrypoint, DDS, and clock scripts live under `scripts/`; VS Code configuration lives under `.vscode/`. The live host path `.devcontainer/src` mounts at `/root/ros2_ws/src` in development containers. Do not introduce root-level `src/`, `docker/`, `compose.yaml`, `tasks/`, `config/`, `calibration/`, `scenes/`, `models/`, `logs/`, or `data/` directories in the implemented layout.
+
+The planned tracked layout is:
 
 ```text
-src/
+dfl_master_manipulation_docker/
+├── .devcontainer/
+│   ├── devcontainer.json
+│   ├── docker-compose-dfl-master-manipulation-ros2-jazzy.yml
+│   └── src/
+├── .vscode/
+├── scripts/
+├── plans/
+├── .dockerignore
+├── .gitignore
+├── AGENTS.md
+├── Context.md
+├── README.md
+└── toolbox_plan.md
+```
+
+`plans/` and `toolbox_plan.md` are retained planning artifacts specific to this repository. Package-owned configuration, calibration, scenes, launch files, tests, and documentation stay inside their owning package beneath `.devcontainer/src/`, as they do in the reference repository. Runtime object data, scan staging, models, caches, and run logs are mounted from configurable durable roots and are not new tracked top-level source directories.
+
+The planned ROS source layout is:
+
+```text
+.devcontainer/src/
 ├── doosan-robot2/
 ├── moveit2_calibration/
 ├── picker1_final_moveit_config/
@@ -48,8 +71,11 @@ src/
 ├── dfl_m3t_integration/
 ├── dfl_genesis_integration/
 ├── object_db/
-└── tasks/
+├── fixed_pick_place/
+└── grasp_test/
 ```
+
+Additional tasks are sibling ROS packages under `.devcontainer/src/<task_name>/`. They are not nested inside the toolbox or a `tasks/` collection directory.
 
 The exact integration-package names may change before their package manifests are created. Their ownership boundaries may not: custom messages belong to the interface package; reusable task and motion behavior belongs to the toolbox; heavy dependency adapters remain isolated; application behavior belongs to task packages.
 
@@ -89,7 +115,7 @@ Approved object bundles live in a nested private `dfl_object_db` Git repository 
 
 Task startup acquires a runtime lease and resolves exact revision IDs and hashes through ObjectDB. Consumers read immutable assets from a shared read-only mount. A running task may continue during an ObjectDB outage after resolution; a new task cannot start. Active or stale-unverified task leases block revision activation.
 
-The object service publishes accepted dynamic objects to MoveIt's planning scene. Static scene geometry belongs to `scenes/<scene_id>/`. Neither the perception pipeline nor the GUI owns a second world model.
+The object service publishes accepted dynamic objects to MoveIt's planning scene. Static scene geometry belongs to the owning toolbox package at `.devcontainer/src/dfl_manipulation_toolbox/scenes/<scene_id>/`. Neither the perception pipeline nor the GUI owns a second world model.
 
 ## Perception and tracking
 

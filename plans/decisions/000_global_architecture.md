@@ -9,7 +9,8 @@ These decisions came from the global grill. Phase and module plans must not ask 
 
 - Build a deployment-focused ROS 2 Jazzy toolbox, not a separate robotics framework.
 - Keep ordinary ROS nodes, launch files, parameters, TF, topics, services, actions, MoveIt, RViz, rosbag, and vendor drivers visible.
-- Keep task packages outside the toolbox under `src/tasks/<task_name>`.
+- Follow the tracked repository layout of `dff_mobile_manipulation_docker`: Compose and the ROS workspace live under `.devcontainer/`, ROS packages live directly under `.devcontainer/src/`, and Docker/build/deployment support lives under `scripts/`.
+- Keep task packages outside the toolbox as sibling packages under `.devcontainer/src/<task_name>`. Do not add an intermediate `tasks/` directory.
 - Keep `object_db` separate from toolbox code.
 - Exclude Nav2, coordinated base-arm planning, cuMotion, open-world perception, old-import compatibility, a multi-user GUI, and automatic task resume from v1.
 
@@ -32,7 +33,7 @@ Reason: this split isolates incompatible GPU and Python dependencies without cre
 - Supported gripper profiles are VGC10 one cup, VGC10 four cups, VGP20, and 2FG14.
 - Supported modes are `real`, `gazebo`, and `genesis`.
 - All twelve robot/tool selections must run in both simulators. Real testing covers mounted and commissioned combinations.
-- A scene lives under `scenes/<scene_id>/` and owns static geometry, expected frames, simulator assets, and default object placement. Runtime perception overlays dynamic objects through the MoveIt planning scene.
+- A scene lives under `.devcontainer/src/dfl_manipulation_toolbox/scenes/<scene_id>/` and owns static geometry, expected frames, simulator assets, and default object placement. Runtime perception overlays dynamic objects through the MoveIt planning scene.
 
 ## Task and motion API
 

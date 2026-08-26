@@ -14,7 +14,7 @@ Create the normal ROS 2 source workspace required by the master plan while keepi
 ## Outputs
 
 - `dependencies.repos` or equivalent exact VCS manifest
-- Project-owned `src/` layout with provenance notes
+- Project-owned `.devcontainer/src/` layout with provenance notes
 - Import script that refuses dirty or mismatched vendor sources
 - Migration ledger for each copied DFL package
 - License inventory and third-party notices
@@ -26,11 +26,12 @@ Create the normal ROS 2 source workspace required by the master plan while keepi
 1. Classify every source as upstream dependency, project-owned package to migrate, reference-only repository, data migration input, or rejected duplicate.
 2. Import `doosan-robot2` from the official Jazzy commit through the VCS manifest. Keep its checkout unmodified; place configuration overlays and adapters in DFL packages.
 3. Migrate `moveit2_calibration`, picker descriptions/bringup/configs, the Zinger base driver, and `ros2_pick_and_place` only after recording source path, commit or content hash, license, and reason.
-4. Create `dfl_manipulation_interfaces`, `dfl_manipulation_toolbox`, the three integration-package locations, the `object_db` application package, `src/tasks`, and scene directories without implementing later-phase behavior.
-5. Reserve `data/object_db/` for the independent private `dfl_object_db` checkout and exclude it from the parent source repository. Store its remote URL and expected access mode without credentials; release and run manifests record the exact data commit.
-6. Run rosdep and colcon graph inspection. Record duplicate package names, missing Jazzy releases, hard-coded Humble paths, Python version assumptions, and dependency cycles.
-7. Define the vendor-patch policy: prefer overlays; if an upstream patch is unavoidable, store a minimal patch file with issue link, tested commit, and removal condition.
-8. Generate a machine-readable source manifest included in every release run record.
+4. Create `dfl_manipulation_interfaces`, `dfl_manipulation_toolbox`, the three integration-package locations, and the `object_db` application package directly under `.devcontainer/src/`. Create each task as another direct child of `.devcontainer/src/`; do not create `.devcontainer/src/tasks/`. Put scene directories inside the toolbox package without implementing later-phase behavior.
+5. Bootstrap the independent private `dfl_object_db` checkout at the configured durable ObjectDB root outside the tracked source tree. Store its remote URL and expected access mode without credentials; release and run manifests record the exact data commit.
+6. Reproduce the reference root convention: `.devcontainer/devcontainer.json`, `.devcontainer/docker-compose-dfl-master-manipulation-ros2-jazzy.yml`, `.devcontainer/src/`, `.vscode/`, and `scripts/`. Retain `plans/` and `toolbox_plan.md` as this repository's planning artifacts. Reject proposed root-level `src/`, `docker/`, `compose.yaml`, `tasks/`, `config/`, `calibration/`, `scenes/`, `models/`, `logs/`, or `data/` source layouts.
+7. Run rosdep and colcon graph inspection. Record duplicate package names, missing Jazzy releases, hard-coded Humble paths, Python version assumptions, and dependency cycles.
+8. Define the vendor-patch policy: prefer overlays; if an upstream patch is unavoidable, store a minimal patch file with issue link, tested commit, and removal condition.
+9. Generate a machine-readable source manifest included in every release run record.
 
 ## Interfaces and data
 
@@ -52,12 +53,13 @@ Create the normal ROS 2 source workspace required by the master plan while keepi
 
 ## Acceptance
 
-- A fresh directory can reproduce the same `src/` dependency revisions.
+- A fresh directory can reproduce the same `.devcontainer/src/` dependency revisions.
 - `vcs status` and the source manifest agree.
 - Colcon discovers each intended package once.
 - Reference-only repositories do not appear in runtime dependencies.
 - Every migrated package has provenance and an explicit Phase owner for its port.
-- A fresh setup can clone `data/object_db/` independently without nesting its history in the parent repository.
+- A fresh setup can clone the configured ObjectDB data root independently without nesting its history in the parent repository.
+- A structure check confirms that tracked ROS packages are direct children of `.devcontainer/src/` and that the prohibited root-level alternatives are absent.
 
 ## Parallel work
 

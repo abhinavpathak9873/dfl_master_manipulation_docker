@@ -23,7 +23,7 @@ Load static scene geometry and overlay tracked known objects into the robot's Mo
 
 ## Work
 
-1. Load static geometry, allowed collision settings, named frames, and simulator world metadata from `scenes/<scene_id>/scene.yaml`. Validate every asset and frame before readiness.
+1. Load static geometry, allowed collision settings, named frames, and simulator world metadata from `.devcontainer/src/dfl_manipulation_toolbox/scenes/<scene_id>/scene.yaml`. Validate every asset and frame before readiness.
 2. Resolve tracked object revisions to approved collision geometry. Transform poses at observation timestamps into the robot planning frame.
 3. Use collision IDs derived from object ID plus track instance. Update pose and health without changing identity.
 4. Increment a scene version for any change that can invalidate a plan. Motion plans record and recheck this version.

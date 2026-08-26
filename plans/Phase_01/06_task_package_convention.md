@@ -13,7 +13,7 @@ Give humans and agents one predictable place and shape for explicit task program
 
 ## Outputs
 
-- `src/tasks/<task_name>` layout specification
+- `.devcontainer/src/<task_name>` layout specification
 - Minimal task package template
 - One-command `ros2 run` entrypoint convention
 - Task configuration and test fixture convention
@@ -22,7 +22,7 @@ Give humans and agents one predictable place and shape for explicit task program
 
 ## Work
 
-1. Require each task package to contain package metadata, a Python module, an executable entry point, task-local configuration, tests, and a short README.
+1. Require each task package to be a direct child of `.devcontainer/src/` and contain package metadata, a Python module or scripts directory, an executable entry point, task-local configuration, tests, and a short README. Match the reference repository's sibling-package convention; never create a `tasks/` parent directory.
 2. Construct `Robot` with explicit robot, gripper, scene, mode, and pipeline selectors near the top of the executable. Detailed values load through the config resolver.
 3. Keep the manipulation sequence in `main()`. Use named stages and targeted `try/except` blocks only where the task has an explicit recovery decision.
 4. Call `Robot.bringup()` once, start run recording, execute stages, and call `bringdown()` plus artifact flush in `finally`.
@@ -52,6 +52,7 @@ Give humans and agents one predictable place and shape for explicit task program
 ## Acceptance
 
 - A new sample task fits the template without editing toolbox code.
+- The sample task is discovered directly under `.devcontainer/src/<task_name>` and no package is nested below `.devcontainer/src/tasks/`.
 - One command runs the task in either simulator by changing only the mode selector or an allowlisted launch argument.
 - Tests verify stage order, cleanup on exception, and config capture.
 - The task README names its robot/tool/scene assumptions and real-hardware qualification state.
