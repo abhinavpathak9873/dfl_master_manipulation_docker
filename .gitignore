@@ -1,0 +1,28 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+secrets/
+*.pem
+*.key
+
+# Generated workspaces and runtime data
+build/
+install/
+log/
+workspace/
+artifacts/
+caches/
+models/
+data/object_db/
+data/scan_staging/
+
+# Python and editor state
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.idea/
+.vscode/
+*~

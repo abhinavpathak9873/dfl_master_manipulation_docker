@@ -1,0 +1,12 @@
+schema_version: 1
+camera_id: picker1_eye_in_hand_d455
+status: unconfigured
+serial: UNCONFIGURED
+parent_frame: picker1_tool_mount
+transform_parent_to_camera: null
+intrinsics: null
+provenance:
+  source: UNCONFIGURED
+  captured_at: null
+  content_sha256: null
+qualification_note: Hardware calibration must replace this sentinel record before real or scan mode.
