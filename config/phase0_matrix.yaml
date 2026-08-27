@@ -1,0 +1,20 @@
+schema_version: 1
+robots:
+  picker1: {model: m1013, expects_base: true, expects_camera: true}
+  picker2: {model: m1013, expects_base: true, expects_camera: true}
+  h2515: {model: h2515, expects_base: false, expects_camera: false}
+tools:
+  vgc10_1cup: {operation: vacuum_on, feedback_is_commanded_only: true}
+  vgc10_4cup: {operation: vacuum_on, feedback_is_commanded_only: true}
+  vgp20: {operation: vacuum_on, feedback_is_commanded_only: true}
+  2fg14: {operation: grip, feedback_is_commanded_only: true}
+modes: [gazebo, genesis]
+scene: empty
+required_operations: [ready, joint_state, home, joint_probe, tool_command, cancel_hold, stop]
+picker_operations: [camera_rgb, base_odometry, base_stop]
+case_id_format: "{mode}-{robot}-{tool}"
+expected_case_count: 24
+dual_picker_case:
+  id: gazebo-dual-picker
+  selections: [picker1/vgc10_1cup, picker2/2fg14]
+  expected: independent namespaces, controllers, TF topics, tool state, and odometry

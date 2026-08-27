@@ -1,0 +1,9 @@
+repositories:
+  doosan-robot2:
+    type: git
+    url: https://github.com/DoosanRobotics/doosan-robot2.git
+    version: 816ecb5d1c2599303eaf9540216afa03552f80ad
+  moveit2_calibration:
+    type: git
+    url: https://github.com/AndrejOrsula/moveit2_calibration.git
+    version: 0263c8c8aa8f1b548bf152969900d74b3fbf9a75

@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="dfl_robot">
+  <xacro:arg name="robot" default="picker1"/>
+  <xacro:arg name="arm_model" default="m1013"/>
+  <xacro:arg name="tool" default="vgc10_1cup"/>
+  <xacro:arg name="control_backend" default="gazebo"/>
+  <xacro:arg name="namespace" default="picker1"/>
+
+  <xacro:include filename="$(find dsr_description2)/xacro/macro.m1013.white.xacro"/>
+  <xacro:include filename="$(find dsr_description2)/xacro/macro.h2515.white.xacro"/>
+  <xacro:include filename="$(find dsr_description2)/ros2_control/m1013.gz_ros2_control.xacro"/>
+  <xacro:include filename="$(find dsr_description2)/ros2_control/h2515.gz_ros2_control.xacro"/>
+
+  <xacro:property name="robot_id" value="$(arg robot)"/>
+  <xacro:property name="model" value="$(arg arm_model)"/>
+  <xacro:property name="tool_id" value="$(arg tool)"/>
+  <xacro:property name="backend" value="$(arg control_backend)"/>
+  <xacro:property name="ns" value="$(arg namespace)"/>
+
+  <link name="world"/>
+  <xacro:if value="${robot_id.startswith('picker')}">
+    <link name="base_footprint">
+      <inertial><mass value="65"/><origin xyz="0 0 0.18"/><inertia ixx="4.0" ixy="0" ixz="0" iyy="4.0" iyz="0" izz="6.0"/></inertial>
+      <visual><origin xyz="0 0 0.18"/><geometry><box size="0.72 0.55 0.36"/></geometry><material name="picker_base"><color rgba="0.15 0.18 0.22 1"/></material></visual>
+      <collision><origin xyz="0 0 0.18"/><geometry><box size="0.72 0.55 0.36"/></geometry></collision>
+    </link>
+    <joint name="world_to_base" type="fixed"><parent link="world"/><child link="base_footprint"/></joint>
+    <joint name="base_to_arm" type="fixed"><origin xyz="0 0 0.42"/><parent link="base_footprint"/><child link="base_link"/></joint>
+  </xacro:if>
+  <xacro:unless value="${robot_id.startswith('picker')}">
+    <joint name="world_to_arm" type="fixed"><parent link="world"/><child link="base_link"/></joint>
+  </xacro:unless>
+
+  <xacro:if value="${model == 'm1013'}"><xacro:m1013 namespace="${ns}" simple="true"/></xacro:if>
+  <xacro:if value="${model == 'h2515'}"><xacro:h2515 namespace="${ns}" simple="true"/></xacro:if>
+
+  <xacro:macro name="box_tool" params="name mass size tcp_xyz body_xyz">
+    <link name="${name}_body">
+      <inertial><mass value="${mass}"/><origin xyz="${body_xyz}"/><inertia ixx="0.002" ixy="0" ixz="0" iyy="0.002" iyz="0" izz="0.002"/></inertial>
+      <visual><origin xyz="${body_xyz}"/><geometry><box size="${size}"/></geometry><material name="tool_blue"><color rgba="0.08 0.32 0.70 1"/></material></visual>
+      <collision><origin xyz="${body_xyz}"/><geometry><box size="${size}"/></geometry></collision>
+    </link>
+    <joint name="${name}_mount" type="fixed"><parent link="link_6"/><child link="${name}_body"/></joint>
+    <link name="tool_tcp"/><joint name="${name}_tcp" type="fixed"><origin xyz="${tcp_xyz}"/><parent link="${name}_body"/><child link="tool_tcp"/></joint>
+  </xacro:macro>
+
+  <xacro:if value="${tool_id == 'vgc10_1cup'}">
+    <link name="vgc10_1cup_body"><inertial><mass value="0.746664"/><origin xyz="0 0 0.0525"/><inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/></inertial><visual><origin xyz="0 0 0.0525"/><geometry><cylinder radius="0.05" length="0.105"/></geometry></visual><collision><origin xyz="0 0 0.0525"/><geometry><cylinder radius="0.05" length="0.105"/></geometry></collision></link>
+    <joint name="vgc10_1cup_mount" type="fixed"><parent link="link_6"/><child link="vgc10_1cup_body"/></joint><link name="tool_tcp"/><joint name="vgc10_1cup_tcp" type="fixed"><origin xyz="0 0 0.17"/><parent link="vgc10_1cup_body"/><child link="tool_tcp"/></joint>
+  </xacro:if>
+  <xacro:if value="${tool_id == 'vgc10_4cup'}"><xacro:box_tool name="vgc10_4cup" mass="0.746664" size="0.170 0.225 0.110" body_xyz="0 0 0.055" tcp_xyz="0 0 0.125"/></xacro:if>
+  <xacro:if value="${tool_id == 'vgp20'}"><xacro:box_tool name="vgp20" mass="2.77" size="0.145 0.105 0.100" body_xyz="0 0.04 0.05" tcp_xyz="0 0.04 0.10"/></xacro:if>
+  <xacro:if value="${tool_id == '2fg14'}"><xacro:box_tool name="2fg14" mass="1.5" size="0.115 0.070 0.1552" body_xyz="0 0 0.0776" tcp_xyz="0 0 0.136"/></xacro:if>
+
+  <xacro:if value="${robot_id.startswith('picker')}">
+    <link name="camera_mount"/><joint name="camera_mount_joint" type="fixed"><origin xyz="0.05 0 0.10" rpy="0 0 0"/><parent link="link_6"/><child link="camera_mount"/></joint>
+    <link name="camera_color_optical_frame"/><joint name="camera_optical_joint" type="fixed"><origin rpy="-1.5708 0 -1.5708"/><parent link="camera_mount"/><child link="camera_color_optical_frame"/></joint>
+  </xacro:if>
+
+  <xacro:if value="${backend == 'gazebo'}">
+    <xacro:if value="${model == 'm1013'}"><xacro:m1013_gz_ros2_control namespace="${ns}" update_rate="100"/></xacro:if>
+    <xacro:if value="${model == 'h2515'}"><xacro:h2515_gz_ros2_control namespace="${ns}" update_rate="100"/></xacro:if>
+    <gazebo>
+      <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+        <ros><namespace>/${ns}</namespace></ros>
+        <parameters>$(find dsr_controller2)/config/dsr_controller2_gz.yaml</parameters>
+      </plugin>
+    </gazebo>
+  </xacro:if>
+</robot>

@@ -1,0 +1,11 @@
+schema_version: 1
+required_simulator_matrix:
+  robots: [picker1, picker2, h2515]
+  tools: [vgc10_1cup, vgc10_4cup, vgp20, 2fg14]
+  modes: [gazebo, genesis]
+simulator_status: implementation_complete_runtime_evidence_required
+real_status: {picker1: not_yet_verified, picker2: not_yet_verified, h2515: not_yet_verified}
+unsupported_claims:
+  - simulated suction seal, pressure, and airflow
+  - simulated 2fg14 grasp force and object retention
+  - H2515 camera data until a camera profile is commissioned

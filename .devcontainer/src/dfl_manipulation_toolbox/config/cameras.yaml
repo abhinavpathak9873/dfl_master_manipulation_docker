@@ -1,0 +1,22 @@
+schema_version: 1
+cameras:
+  d455_picker1:
+    model: Intel RealSense D455
+    serial: unresolved_on_host
+    parent_frame: picker1_camera_mount
+    optical_frame: picker1_camera_color_optical_frame
+    color: {topic: /picker1/camera/color/image_raw, width: 640, height: 480, rate_hz: 15}
+    depth: {topic: /picker1/camera/depth/image_rect_raw, encoding: 32FC1, unit: metre}
+    camera_info_topic: /picker1/camera/color/camera_info
+    calibration: /workspace/calibration/picker1_d455.yaml
+    commissioning: calibration_file_present_hardware_not_verified
+  d455_picker2:
+    model: Intel RealSense D455
+    serial: unresolved_on_host
+    parent_frame: picker2_camera_mount
+    optical_frame: picker2_camera_color_optical_frame
+    color: {topic: /picker2/camera/color/image_raw, width: 640, height: 480, rate_hz: 15}
+    depth: {topic: /picker2/camera/depth/image_rect_raw, encoding: 32FC1, unit: metre}
+    camera_info_topic: /picker2/camera/color/camera_info
+    calibration: unresolved
+    commissioning: not_yet_verified

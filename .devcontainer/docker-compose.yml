@@ -1,0 +1,51 @@
+name: dfl_master_manipulation
+
+services:
+  core:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile.core
+      args:
+        DRCF_VERSION: ${DFL_DRCF_VERSION:-2}
+    image: dfl_master_manipulation:core-jazzy
+    container_name: dfl_master_core
+    network_mode: host
+    ipc: host
+    working_dir: /root/ros2_ws
+    environment:
+      ROS_DOMAIN_ID: ${ROS_DOMAIN_ID:-63}
+      RMW_IMPLEMENTATION: ${RMW_IMPLEMENTATION:-rmw_cyclonedds_cpp}
+      CYCLONEDDS_URI: file:///opt/dfl/scripts/cyclonedds.xml
+      DISPLAY: ${DISPLAY:-:0}
+      QT_X11_NO_MITSHM: "1"
+      DFL_HEADLESS: ${DFL_HEADLESS:-true}
+      DFL_REAL_MOTION_ENABLED: "0"
+    volumes:
+      - ./src:/root/ros2_ws/src:rw
+      - ../scripts:/opt/dfl/scripts:ro
+      - ../tasks:/workspace/tasks:ro
+      - ../calibration:/workspace/calibration:ro
+      - ../objects:/workspace/objects:ro
+      - ../models:/workspace/models:ro
+      - ../data:/workspace/data:rw
+      - ../logs:/workspace/logs:rw
+      - dfl_core_build:/root/ros2_ws/build
+      - dfl_core_install:/root/ros2_ws/install
+      - dfl_core_log:/root/ros2_ws/log
+      - /etc/localtime:/etc/localtime:ro
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    stdin_open: true
+    tty: true
+    init: true
+    healthcheck:
+      test: ["CMD-SHELL", "bash -lc 'source /opt/ros/jazzy/setup.bash && ros2 pkg prefix xacro >/dev/null'"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    command: ["sleep", "infinity"]
+
+volumes:
+  dfl_core_build:
+  dfl_core_install:
+  dfl_core_log:

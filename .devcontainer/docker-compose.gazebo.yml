@@ -1,0 +1,60 @@
+include:
+  - path: docker-compose.yml
+
+services:
+  doosan-emulator:
+    profiles: [vendor-emulator]
+    image: doosanrobot/dsr_emulator@sha256:878b8557dfa2ffd843674e42576fd015b803cc805fe698156eb7b743e71547e9
+    container_name: dfl_master_doosan_emulator
+    environment:
+      ROBOT_MODEL: ${DFL_EMULATOR_MODEL:-M1013}
+    cpuset: ${DFL_EMULATOR_CPUSET:-0-3}
+    ports:
+      - "${DFL_EMULATOR_PORT:-12345}:12345"
+    init: true
+    stdin_open: true
+    tty: true
+    healthcheck:
+      test: ["CMD-SHELL", "bash -lc 'exec 3<>/dev/tcp/127.0.0.1/12345'"]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+      start_period: 30s
+
+  gazebo:
+    profiles: [gazebo]
+    image: dfl_master_manipulation:core-jazzy
+    container_name: dfl_master_gazebo
+    network_mode: host
+    ipc: host
+    working_dir: /root/ros2_ws
+    environment:
+      ROS_DOMAIN_ID: ${ROS_DOMAIN_ID:-63}
+      RMW_IMPLEMENTATION: ${RMW_IMPLEMENTATION:-rmw_cyclonedds_cpp}
+      CYCLONEDDS_URI: file:///opt/dfl/scripts/cyclonedds.xml
+      DISPLAY: ${DISPLAY:-:0}
+      QT_X11_NO_MITSHM: "1"
+      DFL_HEADLESS: ${DFL_HEADLESS:-true}
+      DFL_SIMULATOR: gazebo
+      DFL_REAL_MOTION_ENABLED: "0"
+      GZ_PARTITION: dfl_master_manipulation
+      GZ_SIM_SYSTEM_PLUGIN_PATH: /opt/ros/jazzy/lib:/root/ros2_ws/install/dsr_description2/lib
+    volumes:
+      - ./src:/root/ros2_ws/src:rw
+      - ../scripts:/opt/dfl/scripts:ro
+      - ../tasks:/workspace/tasks:ro
+      - ../calibration:/workspace/calibration:ro
+      - ../objects:/workspace/objects:ro
+      - ../models:/workspace/models:ro
+      - ../data:/workspace/data:rw
+      - ../logs:/workspace/logs:rw
+      - dfl_core_build:/root/ros2_ws/build
+      - dfl_core_install:/root/ros2_ws/install
+      - dfl_core_log:/root/ros2_ws/log
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+      - /etc/localtime:/etc/localtime:ro
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    stdin_open: true
+    tty: true
+    init: true
+    command: ["sleep", "infinity"]

@@ -13,9 +13,19 @@ log/
 workspace/
 artifacts/
 caches/
-models/
+models/*
+!models/.gitkeep
 data/object_db/
 data/scan_staging/
+logs/**
+!logs/.gitkeep
+!logs/phase_00/
+logs/phase_00/**
+!logs/phase_00/.gitkeep
+
+# Reproducible external workspace checkouts
+.devcontainer/src/doosan-robot2/
+.devcontainer/src/moveit2_calibration/
 
 # Python and editor state
 __pycache__/

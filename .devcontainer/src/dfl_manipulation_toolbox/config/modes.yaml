@@ -1,0 +1,18 @@
+schema_version: 1
+modes:
+  gazebo:
+    clock: /clock
+    arm_transport: ros2_control FollowJointTrajectory
+    physics: Gazebo Harmonic
+    real_motion_allowed: false
+  genesis:
+    clock: /clock
+    arm_transport: bridge FollowJointTrajectory
+    physics: Genesis 1.3.3
+    real_motion_allowed: false
+  real:
+    clock: system
+    arm_transport: Doosan DRFL through ros2_control
+    physics: physical hardware
+    real_motion_allowed: only_after_scripts/real_mode_guard.sh
+    commissioning: not_yet_verified

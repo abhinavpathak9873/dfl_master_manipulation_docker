@@ -1,0 +1,17 @@
+.git
+.env
+.env.*
+!.env.example
+.devcontainer/src/doosan-robot2
+.devcontainer/src/moveit2_calibration
+build
+install
+log
+logs
+models
+data
+caches
+artifacts
+**/__pycache__
+**/.pytest_cache
+**/*.pyc

@@ -1,0 +1,56 @@
+FROM ubuntu@sha256:4fbb8e6a8395de5a7550b33509421a2bafbc0aab6c06ba2cef9ebffbc7092d90
+
+ARG DEBIAN_FRONTEND=noninteractive
+ARG ROS_APT_SOURCE_VERSION=1.1.0
+ARG ROS_APT_SOURCE_SHA256=35441f3092fd05773a3c397fab38661bec466584c7a1f1c05366579997cb5fe7
+ARG DRCF_VERSION=2
+
+ENV ROS_DISTRO=jazzy \
+    ROS_WS=/root/ros2_ws \
+    ROS_DOMAIN_ID=63 \
+    RMW_IMPLEMENTATION=rmw_cyclonedds_cpp \
+    DFL_DRCF_VERSION=${DRCF_VERSION} \
+    LANG=en_US.UTF-8 \
+    LC_ALL=en_US.UTF-8
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+       bash-completion build-essential ca-certificates cmake curl dbus-x11 \
+       docker.io git gnupg2 locales lsb-release ninja-build python3-pip \
+       python3-venv software-properties-common sudo \
+    && locale-gen en_US.UTF-8 \
+    && curl -fsSL -o /tmp/ros2-apt-source.deb \
+       "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.noble_all.deb" \
+    && echo "${ROS_APT_SOURCE_SHA256}  /tmp/ros2-apt-source.deb" | sha256sum -c - \
+    && dpkg -i /tmp/ros2-apt-source.deb \
+    && rm /tmp/ros2-apt-source.deb \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+       python3-colcon-common-extensions python3-pytest python3-rosdep \
+       python3-vcstool python3-yaml \
+       ros-jazzy-backward-ros ros-jazzy-control-msgs \
+       ros-jazzy-controller-manager ros-jazzy-cyclonedds \
+       ros-jazzy-desktop ros-jazzy-example-interfaces \
+       ros-jazzy-forward-command-controller ros-jazzy-gazebo-msgs \
+       ros-jazzy-gz-ros2-control ros-jazzy-joint-state-broadcaster \
+       ros-jazzy-joint-state-publisher-gui ros-jazzy-joint-trajectory-controller \
+       ros-jazzy-moveit ros-jazzy-moveit-configs-utils \
+       ros-jazzy-pilz-industrial-motion-planner \
+       ros-jazzy-position-controllers ros-jazzy-realtime-tools \
+       ros-jazzy-rmw-cyclonedds-cpp ros-jazzy-ros-gz \
+       ros-jazzy-ros2-control ros-jazzy-ros2-controllers \
+       ros-jazzy-rosbag2 ros-jazzy-rqt-graph ros-jazzy-urdfdom-py \
+       ros-jazzy-velocity-controllers ros-jazzy-xacro \
+       libpoco-dev libyaml-cpp-dev \
+    && (rosdep init 2>/dev/null || true) \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY scripts /opt/dfl/scripts
+RUN chmod +x /opt/dfl/scripts/*.sh \
+    && mkdir -p /root/ros2_ws/src /root/ros2_ws/build /root/ros2_ws/install /root/ros2_ws/log
+
+WORKDIR /root/ros2_ws
+ENTRYPOINT ["/opt/dfl/scripts/ros_entrypoint.sh"]
+CMD ["sleep", "infinity"]

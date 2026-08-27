@@ -1,0 +1,38 @@
+{
+  "name": "dfl_master_manipulation_docker",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "core",
+  "workspaceFolder": "/root/ros2_ws",
+  "remoteUser": "root",
+  "shutdownAction": "stopCompose",
+  "postCreateCommand": "/opt/dfl/scripts/3_compile_pkgs.sh --quick",
+  "remoteEnv": {
+    "ROS_DISTRO": "jazzy",
+    "ROS_DOMAIN_ID": "${localEnv:ROS_DOMAIN_ID:63}",
+    "RMW_IMPLEMENTATION": "${localEnv:RMW_IMPLEMENTATION:rmw_cyclonedds_cpp}",
+    "ROS_WS": "/root/ros2_ws"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-iot.vscode-ros",
+        "ms-vscode.cpptools",
+        "ms-vscode.cmake-tools",
+        "ms-azuretools.vscode-docker",
+        "redhat.vscode-yaml"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/bin/python3",
+        "python.analysis.extraPaths": [
+          "/opt/ros/jazzy/lib/python3.12/site-packages",
+          "/root/ros2_ws/install/lib/python3.12/site-packages"
+        ],
+        "ros.distro": "jazzy",
+        "C_Cpp.default.cppStandard": "c++17",
+        "C_Cpp.default.compileCommands": "/root/ros2_ws/build/compile_commands.json"
+      }
+    }
+  }
+}

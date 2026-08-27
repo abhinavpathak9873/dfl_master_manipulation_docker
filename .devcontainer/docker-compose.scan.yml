@@ -1,0 +1,28 @@
+include:
+  - path: docker-compose.yml
+
+services:
+  scan-tools:
+    profiles: [scan]
+    image: dfl_master_manipulation:core-jazzy
+    container_name: dfl_master_scan_tools
+    network_mode: host
+    working_dir: /root/ros2_ws
+    environment:
+      ROS_DOMAIN_ID: ${ROS_DOMAIN_ID:-63}
+      RMW_IMPLEMENTATION: ${RMW_IMPLEMENTATION:-rmw_cyclonedds_cpp}
+      DFL_SCAN_PROFILE_FOUNDATION_ONLY: "1"
+      DFL_REAL_MOTION_ENABLED: "0"
+    volumes:
+      - ./src:/root/ros2_ws/src:ro
+      - ../scripts:/opt/dfl/scripts:ro
+      - ../calibration:/workspace/calibration:ro
+      - ../objects:/workspace/objects:ro
+      - ../data/scan_staging:/workspace/data/scan_staging:rw
+      - ../logs:/workspace/logs:rw
+      - /etc/localtime:/etc/localtime:ro
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
+    command: ["sleep", "infinity"]

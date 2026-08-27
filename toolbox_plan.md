@@ -1,8 +1,16 @@
-# DFL Manipulation Toolbox: accepted implementation baseline
+# DFL Manipulation Toolbox: superseded planning snapshot
 
-Status: Accepted for work-packet implementation  
+Status: Superseded on 2026-08-27
+
 Decision date: 2026-08-26  
 Detailed planning pack: [`plans/overview.md`](plans/overview.md)
+
+This file is retained for decision history. The current implementation baseline
+is [`plans/principles.md`](plans/principles.md) plus
+[`plans/decisions/000_global_architecture.md`](plans/decisions/000_global_architecture.md).
+Where this snapshot differs—most notably on root-level ordinary task scripts,
+file-first object data, ObjectDB process scope, or simulator boundaries—the
+dated decision record and Phase work packets control.
 
 ## Objective
 

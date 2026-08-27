@@ -1,0 +1,47 @@
+schema_version: 1
+robots:
+  picker1:
+    arm_model: m1013
+    description: dsr_description2/xacro/m1013.urdf.xacro
+    composite: mobile_base + M1013 + D455
+    namespace: picker1
+    tf_prefix: picker1_
+    planning_group: manipulator
+    controller: /picker1/dsr_position_controller/follow_joint_trajectory
+    joint_state_topic: /picker1/joint_states
+    base: {type: simulated_planar_proxy, cmd_vel_topic: /picker1/cmd_vel, odom_topic: /picker1/odom}
+    camera: d455_picker1
+    emulator: {host: 127.0.0.1, port: 12345}
+    spawn_xyz: [0.0, -1.0, 0.0]
+    supported_modes: [gazebo, genesis, real]
+    commissioning: not_yet_verified
+  picker2:
+    arm_model: m1013
+    description: dsr_description2/xacro/m1013.urdf.xacro
+    composite: mobile_base + M1013 + D455
+    namespace: picker2
+    tf_prefix: picker2_
+    planning_group: manipulator
+    controller: /picker2/dsr_position_controller/follow_joint_trajectory
+    joint_state_topic: /picker2/joint_states
+    base: {type: simulated_planar_proxy, cmd_vel_topic: /picker2/cmd_vel, odom_topic: /picker2/odom}
+    camera: d455_picker2
+    emulator: {host: 127.0.0.1, port: 12346}
+    spawn_xyz: [0.0, 1.0, 0.0]
+    supported_modes: [gazebo, genesis, real]
+    commissioning: not_yet_verified
+  h2515:
+    arm_model: h2515
+    description: dsr_description2/xacro/h2515.urdf.xacro
+    composite: fixed pedestal + H2515
+    namespace: h2515
+    tf_prefix: h2515_
+    planning_group: manipulator
+    controller: /h2515/dsr_position_controller/follow_joint_trajectory
+    joint_state_topic: /h2515/joint_states
+    base: null
+    camera: null
+    emulator: {host: 127.0.0.1, port: 12347}
+    spawn_xyz: [0.0, 0.0, 0.0]
+    supported_modes: [gazebo, genesis, real]
+    commissioning: not_yet_verified

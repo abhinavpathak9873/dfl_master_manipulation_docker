@@ -1,0 +1,61 @@
+schema_version: 1
+tools:
+  vgc10_1cup:
+    kind: vacuum
+    backend: onrobot_vgc10
+    parent_frame: link_6
+    tool_frame: vgc10_1cup_body
+    tcp_frame: tool_tcp
+    payload_kg: 0.746664
+    center_of_mass_m: [0.0, 0.0, 0.085]
+    tcp_xyz_m: [0.0, 0.0, 0.17]
+    collision: {shape: cylinder, radius_m: 0.050, length_m: 0.105}
+    commands: [vacuum_on, release, stop]
+    feedback: [commanded_vacuum]
+    simulated_limitations: commanded state only; no airflow, seal, or payload inference
+    supported_modes: [gazebo, genesis, real]
+  vgc10_4cup:
+    kind: vacuum
+    backend: onrobot_vgc10
+    parent_frame: link_6
+    tool_frame: vgc10_4cup_body
+    tcp_frame: tool_tcp
+    payload_kg: 0.746664
+    center_of_mass_m: [0.0, 0.0, 0.065]
+    tcp_xyz_m: [0.0, 0.0, 0.125]
+    collision: {shape: box, size_m: [0.170, 0.225, 0.110]}
+    commands: [vacuum_on, release, stop]
+    feedback: [commanded_vacuum]
+    simulated_limitations: commanded state only; four cups are one logical channel
+    supported_modes: [gazebo, genesis, real]
+  vgp20:
+    kind: vacuum
+    backend: onrobot_vgp20
+    parent_frame: link_6
+    tool_frame: vgp20_body
+    tcp_frame: tool_tcp
+    payload_kg: 2.77
+    center_of_mass_m: [0.0, 0.04, 0.05]
+    tcp_xyz_m: [0.0, 0.04, 0.10]
+    collision: {shape: box, size_m: [0.145, 0.105, 0.100]}
+    commands: [vacuum_on, release, stop]
+    feedback: [commanded_vacuum]
+    simulated_limitations: commanded state only; no pressure or seal model
+    supported_modes: [gazebo, genesis, real]
+  2fg14:
+    kind: parallel_gripper
+    backend: onrobot_2fg14
+    parent_frame: link_6
+    tool_frame: 2fg14_body
+    tcp_frame: tool_tcp
+    payload_kg: 1.5
+    center_of_mass_m: [0.0, 0.0, 0.061]
+    tcp_xyz_m: [0.0, 0.0, 0.136]
+    collision: {shape: box, size_m: [0.115, 0.070, 0.1552]}
+    commands: [set_width, grip, release, stop]
+    feedback: [commanded_width]
+    simulated_limitations: kinematic commanded width; no grasp force or object constraint
+    supported_modes: [gazebo, genesis, real]
+aliases:
+  vgc10: null
+  two_fg14: 2fg14

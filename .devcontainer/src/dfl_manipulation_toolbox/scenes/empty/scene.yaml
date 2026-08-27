@@ -1,0 +1,5 @@
+id: empty
+frame: world
+description: Empty plane used for Phase 00 description and motion smoke tests.
+static_geometry: []
+dynamic_objects: excluded_use_runtime_scene_updates
