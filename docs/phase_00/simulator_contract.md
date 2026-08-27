@@ -6,6 +6,7 @@ observable compatibility seam, not a simulator framework.
 | Behavior | ROS surface | Gazebo | Genesis | Limitation |
 | --- | --- | --- | --- | --- |
 | Arm command | `/<robot>/dsr_position_controller/follow_joint_trajectory` | Adapter over the vendor position controller | Direct bridge action server | Six ordered Doosan joints only |
+| Relative TCP probe | 20 mm along the current `tool_tcp` Z axis, converted to the shared arm action | Numerical position IK over the expanded vendor chain; measured TCP must finish within 4 mm | Same task and gate | Position-only Phase 00 check; full pose planning belongs to the later motion API |
 | Arm state | `/<robot>/joint_states` | ros2_control broadcaster | Physics bridge | Position and velocity; effort is not claimed |
 | Readiness | `/<robot>/ready` | Simulator I/O node | Bridge and simulator I/O node | Means ROS paths are live, not hardware commissioned |
 | Tool command/state | `/<robot>/tool/command`, `tool/state` using `std_msgs/String` JSON | Command echo | Command echo | No seal, force, or object-retention inference |
@@ -30,7 +31,10 @@ ros2 node list
 Gazebo keeps the upstream `gz_ros2_control` system and
 `dsr_position_controller`. `dfl-trajectory-adapter` only translates the shared
 trajectory action into that controller's position array and verifies measured
-joint convergence. Genesis owns its physics command loop directly.
+joint convergence. Genesis owns its physics command loop directly. The fixed
+task computes its relative target and numerical position IK from the selected
+expanded URDF, then recomputes TCP position from measured joint state; action
+success alone cannot satisfy the relative-motion gate.
 
 The Genesis bridge preserves vendor joint geometry, inertials, frames, and the
 project tool primitives, but substitutes boxes for upstream DAE mesh elements

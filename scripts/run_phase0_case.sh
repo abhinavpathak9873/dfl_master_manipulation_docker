@@ -31,10 +31,12 @@ trap cleanup_container EXIT
 launch_package=dfl_manipulation_toolbox
 launch_file=gazebo.launch.py
 ready_timeout=45
+task_timeout=20
 if [[ "$mode" == genesis ]]; then
   launch_package=dfl_genesis_integration
   launch_file=genesis.launch.py
   ready_timeout=180
+  task_timeout=60
 fi
 
 docker compose --project-name dfl_master_manipulation \
@@ -60,4 +62,4 @@ docker compose --project-name dfl_master_manipulation \
     }
     trap cleanup EXIT
     timeout ${ready_timeout}s ros2 topic echo /$robot/ready std_msgs/msg/Bool --once >/dev/null
-    python3 /workspace/tasks/phase0_fixed_task.py --robot $robot --tool $tool --mode $mode | tee /workspace/logs/phase_00/$mode-$robot-$tool/result.jsonl"
+    python3 /workspace/tasks/phase0_fixed_task.py --robot $robot --tool $tool --mode $mode --timeout ${task_timeout} | tee /workspace/logs/phase_00/$mode-$robot-$tool/result.jsonl"

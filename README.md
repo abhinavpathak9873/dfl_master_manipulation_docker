@@ -53,6 +53,10 @@ scripts/run_phase0_matrix.sh --execute --mode genesis
 scripts/run_dual_picker_smoke.sh
 ```
 
+Each matrix case checks joint motion, a 20 mm tool-frame-relative TCP move with
+a 4 mm measured-position limit, tool command/state, cancellation and stop. The
+Picker cases also check their namespaced RGB-D and base-state paths.
+
 The pinned official Doosan controller emulator is available as a separate,
 one-robot diagnostic boundary. Gazebo physics does not pretend to be driven by
 it; start it explicitly when validating the vendor virtual-controller surface:

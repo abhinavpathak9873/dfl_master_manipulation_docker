@@ -51,7 +51,6 @@ services:
       - dfl_core_build:/root/ros2_ws/build
       - dfl_core_install:/root/ros2_ws/install
       - dfl_core_log:/root/ros2_ws/log
-      - /var/run/docker.sock:/var/run/docker.sock:rw
       - /etc/localtime:/etc/localtime:ro
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
     stdin_open: true

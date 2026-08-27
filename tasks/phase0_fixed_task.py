@@ -6,12 +6,116 @@ from __future__ import annotations
 import argparse
 import json
 import os
+from pathlib import Path
+import subprocess
 import time
+import xml.etree.ElementTree as ET
+
+import numpy as np
 
 
 JOINTS = [f"joint_{index}" for index in range(1, 7)]
 HOME = [0.0, 0.0, 1.5708, 0.0, 1.5708, 0.0]
 PROBE = [0.10, -0.08, 1.48, 0.06, 1.50, -0.05]
+
+
+def _transform(xyz, rpy):
+    roll, pitch, yaw = rpy
+    cr, sr = np.cos(roll), np.sin(roll)
+    cp, sp = np.cos(pitch), np.sin(pitch)
+    cy, sy = np.cos(yaw), np.sin(yaw)
+    rotation = np.array([
+        [cy * cp, cy * sp * sr - sy * cr, cy * sp * cr + sy * sr],
+        [sy * cp, sy * sp * sr + cy * cr, sy * sp * cr - cy * sr],
+        [-sp, cp * sr, cp * cr],
+    ])
+    result = np.eye(4)
+    result[:3, :3] = rotation
+    result[:3, 3] = xyz
+    return result
+
+
+def _axis_rotation(axis, angle):
+    axis = np.asarray(axis, dtype=float)
+    axis /= np.linalg.norm(axis)
+    cross = np.array([
+        [0.0, -axis[2], axis[1]],
+        [axis[2], 0.0, -axis[0]],
+        [-axis[1], axis[0], 0.0],
+    ])
+    result = np.eye(4)
+    result[:3, :3] = np.eye(3) + np.sin(angle) * cross + (1.0 - np.cos(angle)) * (cross @ cross)
+    return result
+
+
+def _expanded_chain(robot, tool):
+    from ament_index_python.packages import get_package_share_directory
+
+    model = "h2515" if robot == "h2515" else "m1013"
+    description = Path(get_package_share_directory("dfl_manipulation_toolbox")) / "urdf/dfl_robot.urdf.xacro"
+    output = subprocess.run([
+        "xacro", str(description), f"robot:={robot}", f"arm_model:={model}", f"tool:={tool}",
+        f"namespace:={robot}", "control_backend:=none",
+    ], check=True, capture_output=True, text=True).stdout
+    document = ET.fromstring(output)
+    by_child = {}
+    for joint in document.findall("joint"):
+        child = joint.find("child").get("link")
+        origin = joint.find("origin")
+        xyz = [float(value) for value in (origin.get("xyz", "0 0 0") if origin is not None else "0 0 0").split()]
+        rpy = [float(value) for value in (origin.get("rpy", "0 0 0") if origin is not None else "0 0 0").split()]
+        axis_element = joint.find("axis")
+        axis = [float(value) for value in (axis_element.get("xyz", "1 0 0") if axis_element is not None else "1 0 0").split()]
+        limit = joint.find("limit")
+        by_child[child] = {
+            "name": joint.get("name"), "type": joint.get("type"),
+            "parent": joint.find("parent").get("link"), "origin": _transform(xyz, rpy), "axis": axis,
+            "lower": float(limit.get("lower", "-6.2832")) if limit is not None else -6.2832,
+            "upper": float(limit.get("upper", "6.2832")) if limit is not None else 6.2832,
+        }
+    chain = []
+    link = "tool_tcp"
+    while link != "base_link":
+        if link not in by_child:
+            raise RuntimeError(f"description has no base_link -> tool_tcp chain at {link}")
+        joint = by_child[link]
+        chain.append(joint)
+        link = joint["parent"]
+    return list(reversed(chain))
+
+
+def _forward(chain, positions):
+    values = dict(zip(JOINTS, positions))
+    result = np.eye(4)
+    for joint in chain:
+        result = result @ joint["origin"]
+        if joint["type"] in {"continuous", "revolute"}:
+            result = result @ _axis_rotation(joint["axis"], values[joint["name"]])
+    return result
+
+
+def _relative_tcp_target(chain, positions, distance_m=0.02):
+    positions = np.asarray(positions, dtype=float)
+    start = _forward(chain, positions)
+    target = start[:3, 3] + start[:3, :3] @ np.array([0.0, 0.0, distance_m])
+    movable = {joint["name"]: joint for joint in chain if joint["name"] in JOINTS}
+    lower = np.array([movable[name]["lower"] for name in JOINTS])
+    upper = np.array([movable[name]["upper"] for name in JOINTS])
+    result = positions.copy()
+    epsilon = 1e-5
+    for _ in range(80):
+        current = _forward(chain, result)[:3, 3]
+        error = target - current
+        if np.linalg.norm(error) < 0.0004:
+            return result.tolist(), target
+        jacobian = np.empty((3, 6))
+        for index in range(6):
+            offset = result.copy()
+            offset[index] += epsilon
+            jacobian[:, index] = (_forward(chain, offset)[:3, 3] - current) / epsilon
+        delta = jacobian.T @ np.linalg.solve(jacobian @ jacobian.T + 1e-5 * np.eye(3), error)
+        result = np.clip(result + np.clip(delta, -0.025, 0.025), lower, upper)
+    raise RuntimeError("relative TCP inverse kinematics did not converge")
 
 
 def parse_args():
@@ -119,6 +223,26 @@ def main() -> None:
         node.wait_for(lambda: node.ready is True and node.last_joint is not None, "ready joint state")
         node.move(HOME)
         node.move(PROBE)
+        chain = _expanded_chain(args.robot, args.tool)
+        current = {name: value for name, value in zip(node.last_joint.name, node.last_joint.position)}
+        relative_joints, relative_target = _relative_tcp_target(chain, [current[name] for name in JOINTS])
+        node.move(relative_joints)
+        relative_error = float("inf")
+        deadline = time.monotonic() + args.timeout
+        while time.monotonic() < deadline:
+            rclpy.spin_once(node, timeout_sec=0.05)
+            measured = {name: value for name, value in zip(node.last_joint.name, node.last_joint.position)}
+            relative_error = float(np.linalg.norm(
+                _forward(chain, [measured[name] for name in JOINTS])[:3, 3] - relative_target
+            ))
+            if relative_error <= 0.004:
+                break
+        else:
+            raise RuntimeError(
+                f"relative TCP probe missed target by {relative_error:.6f} m; "
+                f"commanded_joints={relative_joints}, measured_joints="
+                f"{[measured[name] for name in JOINTS]}"
+            )
         command = String()
         command.data = json.dumps({"operation": "grip" if args.tool == "2fg14" else "vacuum_on", "width_m": 0.03})
         node.tool.publish(command)
@@ -138,6 +262,7 @@ def main() -> None:
             "status": "passed", "joint_count": len(node.last_joint.name),
             "tool_feedback": tool_state, "camera_checked": args.robot.startswith("picker"),
             "base_checked": args.robot.startswith("picker"), "cancel_checked": True,
+            "relative_tcp_checked": True, "relative_tcp_error_m": relative_error,
             "finished_at_unix": time.time(),
         })
         print(json.dumps(summary, sort_keys=True))

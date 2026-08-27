@@ -63,7 +63,7 @@ class TrajectoryAdapter(Node):
             command = Float64MultiArray()
             command.data = list(point.positions)
             self._commands.publish(command)
-        deadline = time.monotonic() + 5.0
+        deadline = time.monotonic() + 12.0
         target = dict(zip(JOINTS, trajectory.points[-1].positions))
         while time.monotonic() < deadline:
             with self._lock:

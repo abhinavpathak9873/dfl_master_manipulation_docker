@@ -225,8 +225,8 @@ def main() -> None:
         camera = scene.add_camera(res=(640, 480), fov=42.5, GUI=False, near=0.05, far=10.0)
     scene.build()
     indices = [entity.get_joint(name).dofs_idx_local[0] for name in JOINTS]
-    entity.set_dofs_kp([2200.0] * 6, indices)
-    entity.set_dofs_kv([90.0] * 6, indices)
+    entity.set_dofs_kp([25000.0] * 6, indices)
+    entity.set_dofs_kv([500.0] * 6, indices)
     entity.set_dofs_position(HOME, indices, zero_velocity=True)
     entity.control_dofs_position(HOME, indices)
     if camera:

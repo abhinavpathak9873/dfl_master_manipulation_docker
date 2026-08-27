@@ -39,9 +39,12 @@ contacts and emulator state consistent.
 
 ## Measured Phase 00 behavior
 
-- All 12 Genesis robot/tool cases passed. Process-level case times were
-  122.8–127.7 seconds on the recorded host; initialization dominates, while the
-  ROS task itself completed in less than one second after readiness.
+- All 12 Genesis robot/tool cases passed joint motion and the measured 20 mm
+  relative-TCP probe. Relative position errors were 0.32–3.82 mm against the
+  4 mm gate.
+- The first cold-cache measurements took 122.8–127.7 seconds per process. With
+  the generated kernels cached, the final matrix took 18.1–19.3 seconds per
+  fresh simulator process on the recorded host.
 - A 200-step M1013/Picker sample sustained 128.1 updates per second. PyTorch
   reported 8.2 MiB allocated and 22.0 MiB reserved after the sample.
 - Each matrix case starts from a fresh simulator process. Process restart is the
@@ -49,3 +52,6 @@ contacts and emulator state consistent.
 - Cancellation holds the measured articulation target. Tool feedback remains
   explicitly commanded rather than measured, and contact/force usefulness is
   not claimed with proxy geometry.
+- The direct bridge's position gains are set high enough to keep the heavier
+  H2515 inside the shared TCP-position gate under simulated gravity. They are
+  simulator control parameters, not real-robot tuning values.
