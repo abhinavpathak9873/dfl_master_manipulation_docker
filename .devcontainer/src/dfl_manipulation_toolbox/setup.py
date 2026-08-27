@@ -23,6 +23,7 @@ setup(
         ("share/" + package_name + "/launch", glob("launch/*.launch.py")),
         ("share/" + package_name + "/urdf", glob("urdf/*.xacro")),
         ("share/" + package_name + "/scenes/empty", glob("scenes/empty/*")),
+        ("share/" + package_name + "/scenes/gallery", glob("scenes/gallery/*")),
     ] + asset_files("meshes"),
     install_requires=["setuptools", "PyYAML"],
     zip_safe=True,

@@ -22,6 +22,8 @@ the current host. Generated result files belong under `logs/phase_00/`.
   one Gazebo world.
 - `scripts/smoke_doosan_emulator.sh`: pinned official emulator startup and TCP
   readiness without claiming that it drives simulator physics.
+- `scripts/render_robot_gallery.sh`: direct Genesis and Gazebo captures for all
+  12 robot/tool selections, stored under `docs/phase_00/gallery/`.
 
 ## Evidence collected on 2026-08-27
 
@@ -31,13 +33,15 @@ the current host. Generated result files belong under `logs/phase_00/`.
 | Jazzy colcon build | passed | Ten project and upstream Doosan/MoveIt packages |
 | Description expansion | 24/24 passed | 12 selections across Gazebo and Genesis backends |
 | MoveIt mapping validation | 12/12 passed | Groups, limits, kinematics, controllers, and tool TCPs |
-| Gazebo fixed-task matrix | 12/12 passed | Detailed Picker visuals; relative-TCP error 3.64–3.97 mm |
+| Gazebo fixed-task matrix | 12/12 passed | Corrected mount chains; relative-TCP error 3.65–3.89 mm |
 | Dual-Picker Gazebo smoke | passed | Two concurrent, namespaced Picker tasks, including relative TCP motion |
 | Official Doosan emulator smoke | passed | Pinned 3.0.1 M1013 service and TCP readiness |
 | Genesis image/GPU | passed | Genesis 1.3.3, PyTorch 2.11.0+cu128, RTX PRO 4500 |
-| Genesis fixed-task matrix | 12/12 passed | Full arm/Picker visuals; relative-TCP error 1.31–3.68 mm |
+| Genesis fixed-task matrix | 12/12 passed | Full arm/Picker visuals and conditional camera anchoring; relative-TCP error 0.66–3.83 mm |
 | Full simulator matrix | 24/24 passed | Every declared robot/tool/mode selection, including measured relative TCP motion |
-| Genesis visual render | passed | Distinct Picker 1/Picker 2 bases, M1013 arm, camera mount, and selected tool render from implemented URDF |
+| Genesis visual gallery | 12/12 passed | Every robot/tool selection rendered from the implemented URDF at the shared home pose |
+| Gazebo visual gallery | 12/12 passed | Every robot/tool selection rendered through an RGB sensor in Gazebo; full DFL mesh resolution verified after resource-path correction |
+| Manual image inspection | 24/24 passed | Full framing, expected base, arm continuity, tool identity, mount chain, missing meshes, and home-pose agreement |
 | Genesis timing sample | passed | 128.1 Hz; 8.2 MiB allocated, 22.0 MiB reserved |
 
 ## Evidence rules
@@ -58,3 +62,8 @@ Real hardware is outside the Phase 00 proof. Picker 1, Picker 2, H2515, every
 physical tool, and both D455 serial/mount records remain `not_yet_verified` until
 a later commissioning session has fresh motion authorization and mounted-hardware
 evidence.
+
+The durable images and inspection notes are in
+[`gallery/README.md`](gallery/README.md). The confidence level of each modeled
+part, and the work still required for safe task transfer, is recorded in
+[`simulation_fidelity.md`](simulation_fidelity.md).

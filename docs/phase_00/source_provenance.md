@@ -16,6 +16,7 @@ not committed into the parent repository.
 | `dff_mobile_manipulation_docker` | `b5a206e454516aeb33e257a9cc5918ce5520d82d` | project source | Behavioral reference only | none |
 | `dff_labs_docker` | `b32fca56c0f8b1f5707dd50c64a0e636617df903` | project source | Jazzy/Genesis precedent; code is reworked, not vendored | genesis |
 | `dff_intelligence_docker` | `0953f8151434fcfdc3b6a3ef929465dc075aa066` | project source | ObjectDB/perception reference only | later phases |
+| OnRobot 2FG14 datasheet v1.2.1 | vendor PDF, accessed 2026-08-27 | reference data only | Published 155.2 x 115 x 70 mm envelope, 1.5 kg mass, and TCP dimensions used for the dimension-derived Phase 00 visual/collision model; no vendor CAD copied | core |
 
 The local Humble `doosan-robot2` checkout was dirty when Phase 00 began and is
 not an import source. `scripts/inspect_sources.py` rejects dirty or mismatched
@@ -25,3 +26,10 @@ The retained Picker files, original relative paths, and individual SHA-256
 values are recorded beside the assets in
 `.devcontainer/src/dfl_manipulation_toolbox/meshes/README.md`. This avoids
 depending on the old workspace at runtime or copying its package wholesale.
+
+The OnRobot reference is
+<https://onrobot.com/storage/datasheets/datasheet_2fg14_v1.2.1_en.pdf>.
+The workspace contains no 2FG14 CAD. The URDF therefore uses labeled,
+dimension-derived primitives for appearance and a conservative full-sweep box
+for collision checking. It must be replaced if redistributable vendor CAD and
+installed finger measurements become available.

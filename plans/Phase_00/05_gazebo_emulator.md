@@ -32,6 +32,8 @@ ROS topics, TF, controllers, camera data, and gripper state directly visible.
 6. Run fixed home, joint, Cartesian, gripper, camera, base, cancel, stop, and
    collision tasks.
 7. Capture direct ROS diagnostic commands for common failures.
+8. Render every robot/tool selection through a headless Gazebo camera. Treat
+   unresolved or omitted meshes as a failed gate even when ROS behavior passes.
 
 ## Outputs
 
@@ -39,6 +41,7 @@ ROS topics, TF, controllers, camera data, and gripper state directly visible.
 - Simulator behavior/limitation table.
 - Fixed task scripts and compact evidence.
 - Namespaced dual-Picker smoke path.
+- Twelve direct simulator captures and a repeatable headless capture command.
 
 ## Acceptance
 
@@ -47,6 +50,8 @@ ROS topics, TF, controllers, camera data, and gripper state directly visible.
 - Stop/cancel and unsupported force behavior are explicit.
 - Picker 1 and Picker 2 can coexist without graph collisions.
 - Failures can be traced through task -> adapter -> ROS/MoveIt/Gazebo.
+- Gazebo resolves and renders the full visual mesh set for every selection; a
+  missing mesh cannot pass on the strength of the motion matrix alone.
 
 ## Non-goals
 

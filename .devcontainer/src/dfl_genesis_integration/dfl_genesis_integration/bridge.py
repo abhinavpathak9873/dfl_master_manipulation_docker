@@ -29,6 +29,7 @@ from std_msgs.msg import Bool
 
 JOINTS = [f"joint_{index}" for index in range(1, 7)]
 HOME = [0.0, 0.0, 1.5708, 0.0, 1.5708, 0.0]
+CAMERA_MOUNT_TOOLS = {"vgc10_4cup", "2fg14"}
 
 
 def expanded_urdf(robot: str, model: str, tool: str) -> Path:
@@ -252,7 +253,12 @@ def main() -> None:
     entity.set_dofs_position(HOME, indices, zero_velocity=True)
     entity.control_dofs_position(HOME, indices)
     if camera:
-        camera.attach(entity.get_link("camera_mount"), np.eye(4, dtype=np.float32))
+        # The workspace camera plate is in the visual chain only for these two
+        # Picker tools. Direct-mount tools still expose the same RGB-D contract,
+        # so their simulated sensor is anchored at the flange until a current
+        # serial-specific hand-eye calibration supplies the real transform.
+        camera_parent = "camera_mount" if args.tool in CAMERA_MOUNT_TOOLS else "link_6"
+        camera.attach(entity.get_link(camera_parent), np.eye(4, dtype=np.float32))
     bridge = RosBridge(args.robot, entity, indices, camera)
     running = True
     def stop(*_):

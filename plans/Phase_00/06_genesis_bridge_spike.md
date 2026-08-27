@@ -31,6 +31,9 @@ framework?
    direct bridge alternative, including task-visible differences.
 7. Return for review only if a material capability cannot be preserved; do not
    silently drop Genesis or any robot/tool combination.
+8. Preserve full visual meshes while converting only collision assets that the
+   Genesis URDF parser cannot load. Render all 12 selections at the shared home
+   pose and inspect them against Gazebo.
 
 ## Outputs
 
@@ -38,6 +41,7 @@ framework?
 - Accepted bridge decision with measured evidence.
 - Required adapter/description work for the 24-run matrix.
 - Honest limitations and direct debugging path.
+- Twelve direct Genesis captures using the implemented URDF, not concept art.
 
 ## Acceptance
 
@@ -46,6 +50,7 @@ framework?
 - The chosen route has bounded, measured timing and clear failure behavior.
 - The decision names no speculative generalized simulator interface.
 - Remaining work for Picker 1, Picker 2, H2515, and four tools is explicit.
+- Visual fidelity and physics fidelity are reported separately.
 
 ## Non-goals
 

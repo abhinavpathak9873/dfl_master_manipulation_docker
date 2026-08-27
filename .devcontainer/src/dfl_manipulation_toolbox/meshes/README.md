@@ -19,3 +19,10 @@ The base and tool meshes are visual geometry. Simple declared primitives remain
 the collision boundary for the composite bases and tools. The arm collision
 meshes come from `doosan-robot2`; the Genesis adapter converts their DAE files
 to cached STL and lets Genesis decimate and convexify them.
+
+`hand_camera_axis_s.dae` is the complete hand-camera plate assembly retained by
+the old Picker description, despite the shorter installed filename. It is used
+only where that source description put it in the kinematic tool chain: Picker
+VGC10 four-cup and 2FG14 selections. The repository does not contain a 2FG14
+mesh; its Phase 00 visual is made from dimensioned URDF primitives and is
+explicitly tracked as an approximation.

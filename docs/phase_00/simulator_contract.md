@@ -44,3 +44,16 @@ Genesis then decimates and convexifies those collision assets. Base and tool
 collision boundaries remain the declared conservative primitives. Genesis
 contact, clearance, or force results are therefore not qualification evidence
 in Phase 00.
+
+Gazebo resolves project mesh URIs through the package-share roots declared in
+`GZ_SIM_RESOURCE_PATH`. The gallery capture caught and fixed a prior state in
+which Gazebo silently omitted the DFL Picker base and hand-camera meshes while
+the ROS task still passed. Visual acceptance is therefore a separate gate from
+the 24-case behavior matrix.
+
+The hand-camera plate is part of the source mounting chain for Picker VGC10
+four-cup and 2FG14 selections. It is absent from Picker VGC10 one-cup and VGP20
+selections, and from H2515 selections. The 2FG14 shape is a dimension-derived
+visual model with static nominal jaws, not vendor CAD. See
+[`simulation_fidelity.md`](simulation_fidelity.md) for the complete transfer
+boundary.

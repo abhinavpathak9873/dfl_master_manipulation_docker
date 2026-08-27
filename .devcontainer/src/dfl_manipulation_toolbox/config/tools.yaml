@@ -19,6 +19,8 @@ tools:
     kind: vacuum
     backend: onrobot_vgc10
     parent_frame: link_6
+    picker_mount_chain: [link_6, camera_mount, vgc10_4cup_body]
+    picker_mount_offset_m: [0.0, 0.0, 0.0125]
     tool_frame: vgc10_4cup_body
     tcp_frame: tool_tcp
     payload_kg: 0.746664
@@ -54,11 +56,14 @@ tools:
     payload_kg: 1.5
     center_of_mass_m: [0.0, 0.0, 0.061]
     tcp_xyz_m: [0.0, 0.0, 0.136]
-    visual_mesh: null
+    visual_mesh: dimension_derived_urdf_primitives
+    visual_basis: OnRobot published 155.2 x 115 x 70 mm envelope; nominal open-jaw depiction
+    picker_mount_chain: [link_6, camera_mount, 2fg14_body]
+    picker_mount_offset_m: [0.0, 0.0, 0.0136]
     collision: {shape: box, size_m: [0.115, 0.070, 0.1552]}
     commands: [set_width, grip, release, stop]
     feedback: [commanded_width]
-    simulated_limitations: conservative published-dimension envelope; no redistributable workspace CAD, grasp force, or object constraint
+    simulated_limitations: dimension-derived visual and conservative full-sweep collision envelope; static nominal jaws; no redistributable workspace CAD, grasp force, or object constraint
     supported_modes: [gazebo, genesis, real]
 aliases:
   vgc10: null

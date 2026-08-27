@@ -34,6 +34,8 @@ backend.
 6. Run a dual-Picker namespace/concurrency smoke task.
 7. Save concise per-run result, timing, selected revisions, and failure logs only
    as needed to reproduce issues.
+8. Add an orthogonal 24-image visual matrix. Inspect base, arm, mount, selected
+   tool, attachment, framing, missing mesh errors, and home-pose agreement.
 
 ## Outputs
 
@@ -41,6 +43,7 @@ backend.
 - Compact result table and failure artifacts.
 - List of real simulator limitations by operation/combination.
 - Reproduction commands.
+- A checked Genesis/Gazebo gallery for all 12 robot/tool selections.
 
 ## Acceptance
 
@@ -51,6 +54,7 @@ backend.
 - Failed combinations are diagnosable through direct task/adapter/ROS paths.
 - The matrix does not require a workflow engine, release service, or ObjectDB
   process.
+- Behavioral success cannot hide a visual mesh load failure.
 
 ## Non-goals
 

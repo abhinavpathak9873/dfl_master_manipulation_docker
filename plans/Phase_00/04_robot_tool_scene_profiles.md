@@ -39,6 +39,11 @@ task.
    simulators.
 7. Provide a direct profile inspection/validation command; no config daemon or
    generated capability catalogue.
+8. Preserve source mounting chains. The Picker hand-camera plate sits between
+   `link_6` and VGC10 four-cup or 2FG14; one-cup and VGP20 mount directly. Do
+   not add the Picker plate to H2515.
+9. Record visual provenance separately from collision and actuation fidelity.
+   A dimension-derived 2FG14 model is not interchangeable with vendor CAD.
 
 ## Outputs
 
@@ -46,6 +51,8 @@ task.
 - Compatibility/commissioning table.
 - Valid descriptions and collision geometry for the simulator matrix.
 - Calibration and scene path conventions.
+- A fidelity ledger that states which facts are CAD-backed, dimension-derived,
+  conservative, simulated-only, or still awaiting hardware measurement.
 
 ## Acceptance
 
@@ -55,6 +62,8 @@ task.
 - Real support is claimed only with mounted-hardware evidence.
 - Invalid IDs, missing mounts/frames, and unsupported mode operations fail with
   actionable errors.
+- The 12 generated selections have visually distinguishable tools and the
+  expected intermediate mounts.
 
 ## Non-goals
 

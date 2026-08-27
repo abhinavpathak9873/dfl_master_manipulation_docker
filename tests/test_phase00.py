@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import itertools
 from pathlib import Path
+import struct
 import sys
 import unittest
 
@@ -64,6 +65,42 @@ class Phase00Tests(unittest.TestCase):
         for relative, digest in expected.items():
             contents = (PACKAGE / "meshes" / relative).read_bytes()
             self.assertEqual(digest, hashlib.sha256(contents).hexdigest(), relative)
+
+    def test_checked_gallery_contains_exact_visual_matrix(self):
+        gallery = ROOT / "docs/phase_00/gallery"
+        expected = {
+            gallery / mode / f"{robot}-{tool}.png"
+            for mode, robot, tool in itertools.product(
+                ("genesis", "gazebo"),
+                ("picker1", "picker2", "h2515"),
+                ("vgc10_1cup", "vgc10_4cup", "vgp20", "2fg14"),
+            )
+        }
+        actual = set(gallery.glob("*/*.png"))
+        self.assertEqual(expected, actual)
+        for path in actual:
+            data = path.read_bytes()
+            self.assertEqual(b"\x89PNG\r\n\x1a\n", data[:8], path)
+            width, height = struct.unpack(">II", data[16:24])
+            self.assertEqual((1280, 960), (width, height), path)
+
+    def test_gazebo_declares_project_mesh_resource_paths(self):
+        compose = (ROOT / ".devcontainer/docker-compose.gazebo.yml").read_text()
+        self.assertIn("GZ_SIM_RESOURCE_PATH", compose)
+        self.assertIn("dfl_manipulation_toolbox/share", compose)
+
+    def test_gallery_scene_is_packaged(self):
+        setup = (PACKAGE / "setup.py").read_text()
+        self.assertIn('scenes/gallery', setup)
+        self.assertTrue((PACKAGE / "scenes/gallery/world.sdf").is_file())
+
+    def test_genesis_camera_parent_covers_direct_mount_tools(self):
+        bridge = (
+            ROOT / ".devcontainer/src/dfl_genesis_integration/"
+            "dfl_genesis_integration/bridge.py"
+        ).read_text()
+        self.assertIn('CAMERA_MOUNT_TOOLS = {"vgc10_4cup", "2fg14"}', bridge)
+        self.assertIn('else "link_6"', bridge)
 
 
 if __name__ == "__main__":

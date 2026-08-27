@@ -3,7 +3,7 @@ robots:
   picker1:
     arm_model: m1013
     description: dfl_manipulation_toolbox/urdf/dfl_robot.urdf.xacro
-    composite: Picker 1 base mesh and pedestal + pinned M1013 + D455 hand mount
+    composite: Picker 1 base mesh and pedestal + pinned M1013; workspace hand-camera assembly on source-matched tool chains
     namespace: picker1
     tf_prefix: picker1_
     planning_group: manipulator
@@ -18,7 +18,7 @@ robots:
   picker2:
     arm_model: m1013
     description: dfl_manipulation_toolbox/urdf/dfl_robot.urdf.xacro
-    composite: Picker 2 base mesh + pinned M1013 + D455 hand mount
+    composite: Picker 2 base mesh + pinned M1013; workspace hand-camera assembly on source-matched tool chains
     namespace: picker2
     tf_prefix: picker2_
     planning_group: manipulator

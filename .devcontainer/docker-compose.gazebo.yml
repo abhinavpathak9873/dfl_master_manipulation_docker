@@ -39,6 +39,7 @@ services:
       DFL_REAL_MOTION_ENABLED: "0"
       GZ_PARTITION: dfl_master_manipulation
       GZ_SIM_SYSTEM_PLUGIN_PATH: /opt/ros/jazzy/lib:/root/ros2_ws/install/dsr_description2/lib
+      GZ_SIM_RESOURCE_PATH: /root/ros2_ws/install/dfl_manipulation_toolbox/share:/root/ros2_ws/install/dsr_description2/share
     volumes:
       - ./src:/root/ros2_ws/src:rw
       - ../scripts:/opt/dfl/scripts:ro
