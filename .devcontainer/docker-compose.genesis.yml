@@ -46,11 +46,11 @@ services:
     tty: true
     init: true
     healthcheck:
-      test: ["CMD-SHELL", "python -c 'import genesis, torch; assert torch.cuda.is_available()'"]
-      interval: 20s
-      timeout: 15s
+      test: ["CMD-SHELL", "nvidia-smi -L >/dev/null && python -c 'from importlib.metadata import version; assert version(\"genesis-world\") == \"1.3.3\"'"]
+      interval: 30s
+      timeout: 5s
       retries: 12
-      start_period: 2m
+      start_period: 30s
     command: ["sleep", "infinity"]
 
 volumes:

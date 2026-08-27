@@ -1,7 +1,16 @@
 from glob import glob
+from pathlib import Path
 from setuptools import find_packages, setup
 
 package_name = "dfl_manipulation_toolbox"
+
+
+def asset_files(root: str):
+    return [
+        ("share/" + package_name + "/" + str(path.parent), [str(path)])
+        for path in Path(root).glob("**/*")
+        if path.is_file()
+    ]
 
 setup(
     name=package_name,
@@ -14,7 +23,7 @@ setup(
         ("share/" + package_name + "/launch", glob("launch/*.launch.py")),
         ("share/" + package_name + "/urdf", glob("urdf/*.xacro")),
         ("share/" + package_name + "/scenes/empty", glob("scenes/empty/*")),
-    ],
+    ] + asset_files("meshes"),
     install_requires=["setuptools", "PyYAML"],
     zip_safe=True,
     maintainer="DFL Robotics",

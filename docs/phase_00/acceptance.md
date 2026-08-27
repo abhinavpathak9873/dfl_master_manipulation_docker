@@ -31,12 +31,13 @@ the current host. Generated result files belong under `logs/phase_00/`.
 | Jazzy colcon build | passed | Ten project and upstream Doosan/MoveIt packages |
 | Description expansion | 24/24 passed | 12 selections across Gazebo and Genesis backends |
 | MoveIt mapping validation | 12/12 passed | Groups, limits, kinematics, controllers, and tool TCPs |
-| Gazebo fixed-task matrix | 12/12 passed | Three robot identities by four tools; relative-TCP error 3.63–3.89 mm |
+| Gazebo fixed-task matrix | 12/12 passed | Detailed Picker visuals; relative-TCP error 3.64–3.97 mm |
 | Dual-Picker Gazebo smoke | passed | Two concurrent, namespaced Picker tasks, including relative TCP motion |
 | Official Doosan emulator smoke | passed | Pinned 3.0.1 M1013 service and TCP readiness |
 | Genesis image/GPU | passed | Genesis 1.3.3, PyTorch 2.11.0+cu128, RTX PRO 4500 |
-| Genesis fixed-task matrix | 12/12 passed | Three robot identities by four tools; relative-TCP error 0.32–3.82 mm |
+| Genesis fixed-task matrix | 12/12 passed | Full arm/Picker visuals; relative-TCP error 1.31–3.68 mm |
 | Full simulator matrix | 24/24 passed | Every declared robot/tool/mode selection, including measured relative TCP motion |
+| Genesis visual render | passed | Distinct Picker 1/Picker 2 bases, M1013 arm, camera mount, and selected tool render from implemented URDF |
 | Genesis timing sample | passed | 128.1 Hz; 8.2 MiB allocated, 22.0 MiB reserved |
 
 ## Evidence rules

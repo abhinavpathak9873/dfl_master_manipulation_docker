@@ -9,6 +9,7 @@ tools:
     payload_kg: 0.746664
     center_of_mass_m: [0.0, 0.0, 0.085]
     tcp_xyz_m: [0.0, 0.0, 0.17]
+    visual_mesh: meshes/tools/vgc10_1cup.dae
     collision: {shape: cylinder, radius_m: 0.050, length_m: 0.105}
     commands: [vacuum_on, release, stop]
     feedback: [commanded_vacuum]
@@ -23,6 +24,7 @@ tools:
     payload_kg: 0.746664
     center_of_mass_m: [0.0, 0.0, 0.065]
     tcp_xyz_m: [0.0, 0.0, 0.125]
+    visual_mesh: meshes/tools/vgc10_4cup.dae
     collision: {shape: box, size_m: [0.170, 0.225, 0.110]}
     commands: [vacuum_on, release, stop]
     feedback: [commanded_vacuum]
@@ -37,6 +39,7 @@ tools:
     payload_kg: 2.77
     center_of_mass_m: [0.0, 0.04, 0.05]
     tcp_xyz_m: [0.0, 0.04, 0.10]
+    visual_mesh: meshes/tools/vgp20.dae
     collision: {shape: box, size_m: [0.145, 0.105, 0.100]}
     commands: [vacuum_on, release, stop]
     feedback: [commanded_vacuum]
@@ -51,10 +54,11 @@ tools:
     payload_kg: 1.5
     center_of_mass_m: [0.0, 0.0, 0.061]
     tcp_xyz_m: [0.0, 0.0, 0.136]
+    visual_mesh: null
     collision: {shape: box, size_m: [0.115, 0.070, 0.1552]}
     commands: [set_width, grip, release, stop]
     feedback: [commanded_width]
-    simulated_limitations: kinematic commanded width; no grasp force or object constraint
+    simulated_limitations: conservative published-dimension envelope; no redistributable workspace CAD, grasp force, or object constraint
     supported_modes: [gazebo, genesis, real]
 aliases:
   vgc10: null

@@ -2,8 +2,8 @@ schema_version: 1
 robots:
   picker1:
     arm_model: m1013
-    description: dsr_description2/xacro/m1013.urdf.xacro
-    composite: mobile_base + M1013 + D455
+    description: dfl_manipulation_toolbox/urdf/dfl_robot.urdf.xacro
+    composite: Picker 1 base mesh and pedestal + pinned M1013 + D455 hand mount
     namespace: picker1
     tf_prefix: picker1_
     planning_group: manipulator
@@ -17,8 +17,8 @@ robots:
     commissioning: not_yet_verified
   picker2:
     arm_model: m1013
-    description: dsr_description2/xacro/m1013.urdf.xacro
-    composite: mobile_base + M1013 + D455
+    description: dfl_manipulation_toolbox/urdf/dfl_robot.urdf.xacro
+    composite: Picker 2 base mesh + pinned M1013 + D455 hand mount
     namespace: picker2
     tf_prefix: picker2_
     planning_group: manipulator
@@ -32,7 +32,7 @@ robots:
     commissioning: not_yet_verified
   h2515:
     arm_model: h2515
-    description: dsr_description2/xacro/h2515.urdf.xacro
+    description: dfl_manipulation_toolbox/urdf/dfl_robot.urdf.xacro
     composite: fixed pedestal + H2515
     namespace: h2515
     tf_prefix: h2515_

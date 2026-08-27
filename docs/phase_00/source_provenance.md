@@ -9,7 +9,7 @@ not committed into the parent repository.
 | `moveit2_calibration` | `0263c8c8aa8f1b548bf152969900d74b3fbf9a75` | BSD-3-Clause | Import when calibration work is requested | core |
 | `picker1_final_moveit_config` | `08db01efd4b5ec2c75d7295a581a4eb2345419722964ae27ae59ac36fa901132` | unresolved local input | Reference/migrate after license resolution | none |
 | `picker2_bringup` | `acd187e138f4bf33f932ee5cbe266a4e47f222b409e4560756cb903a45cf8da1` | unresolved local input | Reference for frames and launch behavior | none |
-| `picker2_description` | `81867f72b2b504632b8ec9e75800d82fe1641e6f996f11020128d352d5501d3d` | unresolved local input | Reference for DFL composition; do not copy wholesale | none |
+| `picker2_description` | `81867f72b2b504632b8ec9e75800d82fe1641e6f996f11020128d352d5501d3d` plus per-asset hashes | BSD-3-Clause as declared in `package.xml` | Retain the six DFL-specific Picker base/tool/camera visual assets; arm meshes stay with pinned Doosan source | core |
 | `picker2_final_moveit_config` | `45fb366ebc83d3693f0eeed535b058a5c4fd59e5be396694271715b85f06de8f` | unresolved local input | Reference/migrate after license resolution | none |
 | `rlab_zinger_4ws-main` | `4fdc8ed3f6d22c8f40d5f06aed2424d35da92ebd4f501db7714c86b971563705` | unresolved local input | Reference for installed base only; not a Phase 00 dependency | gateway |
 | `ros2_pick_and_place` | `1f4a408d841cb6fa20e02befe81ccf02930070f7ad95d44a6e7813126a1403fa` | unresolved local input | Characterization input; not copied | none |
@@ -20,3 +20,8 @@ not committed into the parent repository.
 The local Humble `doosan-robot2` checkout was dirty when Phase 00 began and is
 not an import source. `scripts/inspect_sources.py` rejects dirty or mismatched
 required checkouts.
+
+The retained Picker files, original relative paths, and individual SHA-256
+values are recorded beside the assets in
+`.devcontainer/src/dfl_manipulation_toolbox/meshes/README.md`. This avoids
+depending on the old workspace at runtime or copying its package wholesale.

@@ -57,6 +57,14 @@ Each matrix case checks joint motion, a 20 mm tool-frame-relative TCP move with
 a 4 mm measured-position limit, tool command/state, cancellation and stop. The
 Picker cases also check their namespaced RGB-D and base-state paths.
 
+The Picker visuals use their distinct base, camera-mount, and supported vacuum
+tool meshes retained from `DFL_Manipulation_Workspace`. The M1013/H2515 meshes
+come from the pinned Jazzy Doosan source. Produce an inspectable PNG with:
+
+```bash
+scripts/render_genesis_preview.sh picker1 vgc10_1cup
+```
+
 The pinned official Doosan controller emulator is available as a separate,
 one-robot diagnostic boundary. Gazebo physics does not pretend to be driven by
 it; start it explicitly when validating the vendor virtual-controller surface:

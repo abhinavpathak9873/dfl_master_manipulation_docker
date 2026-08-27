@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 import signal
@@ -16,6 +17,7 @@ import genesis as gs
 import numpy as np
 import rclpy
 import torch
+import trimesh
 from ament_index_python.packages import get_package_share_directory
 from control_msgs.action import FollowJointTrajectory
 from rclpy.action import ActionServer, CancelResponse, GoalResponse
@@ -36,7 +38,9 @@ def expanded_urdf(robot: str, model: str, tool: str) -> Path:
                f"namespace:={robot}", "control_backend:=none"]
     output = subprocess.run(command, check=True, text=True, capture_output=True).stdout
     dsr_share = get_package_share_directory("dsr_description2")
+    dfl_share = get_package_share_directory("dfl_manipulation_toolbox")
     output = output.replace("package://dsr_description2", dsr_share)
+    output = output.replace("package://dfl_manipulation_toolbox", dfl_share)
     document = ET.fromstring(output)
     for joint in document.findall("joint"):
         if joint.get("type") not in {"continuous", "prismatic", "revolute"}:
@@ -48,20 +52,35 @@ def expanded_urdf(robot: str, model: str, tool: str) -> Path:
         # object-typed array, which cannot initialize the rigid solver.
         dynamics.set("damping", dynamics.get("damping", "0.1"))
     for link in document.findall("link"):
-        for shape in [*link.findall("visual"), *link.findall("collision")]:
+        for shape in link.findall("collision"):
             geometry = shape.find("geometry")
-            if geometry is None or geometry.find("mesh") is None:
+            mesh = geometry.find("mesh") if geometry is not None else None
+            if mesh is None:
                 continue
-            # Genesis 1.3.3's legacy URDF loader cannot decode the vendor DAE
-            # assets.  A bounded proxy keeps the articulation, inertials, tool
-            # mount, and ROS frames testable without a multi-minute VHACD stall.
-            for child in list(geometry):
-                geometry.remove(child)
-            ET.SubElement(geometry, "box", {"size": "0.08 0.08 0.18"})
+            source = Path(mesh.get("filename"))
+            if source.suffix.lower() == ".dae":
+                mesh.set("filename", str(_cached_collision_stl(source)))
     output = ET.tostring(document, encoding="unicode")
     path = Path(tempfile.gettempdir()) / f"dfl_{robot}_{tool}_genesis.urdf"
     path.write_text(output, encoding="utf-8")
     return path
+
+
+def _cached_collision_stl(source: Path) -> Path:
+    """Convert a DAE collision mesh once; Genesis still renders the source visual."""
+    digest = hashlib.sha256(source.read_bytes()).hexdigest()
+    cache = Path.home() / ".cache/dfl_genesis/collision_meshes"
+    cache.mkdir(parents=True, exist_ok=True)
+    output = cache / f"{digest}.stl"
+    if output.exists():
+        return output
+    loaded = trimesh.load(source, force="mesh", process=False)
+    if not isinstance(loaded, trimesh.Trimesh) or loaded.is_empty:
+        raise RuntimeError(f"could not convert collision mesh {source}")
+    temporary = output.with_suffix(".tmp.stl")
+    loaded.export(temporary, file_type="stl")
+    temporary.replace(output)
+    return output
 
 
 class RosBridge:
@@ -219,7 +238,10 @@ def main() -> None:
     )
     scene.add_entity(gs.morphs.Plane())
     urdf = expanded_urdf(args.robot, args.model, args.tool)
-    entity = scene.add_entity(gs.morphs.URDF(file=str(urdf), fixed=True, merge_fixed_links=False, convexify=False))
+    entity = scene.add_entity(gs.morphs.URDF(
+        file=str(urdf), fixed=True, merge_fixed_links=False,
+        convexify=True, decimate=True, decimate_face_num=500,
+    ))
     camera = None
     if args.robot.startswith("picker"):
         camera = scene.add_camera(res=(640, 480), fov=42.5, GUI=False, near=0.05, far=10.0)

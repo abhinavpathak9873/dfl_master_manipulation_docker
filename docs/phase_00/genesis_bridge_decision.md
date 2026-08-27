@@ -17,14 +17,18 @@ state, and explicit readiness. It loads the same expanded M1013/H2515 and tool
 URDF used for description checks. The implementation is confined to
 `dfl_genesis_integration`; task code does not import Genesis.
 
-Genesis 1.3.3's legacy URDF loader cannot decode the upstream Doosan DAE meshes.
-Passing them to its convexifier stalled construction for more than two minutes.
-The bridge therefore replaces only mesh-backed visual and collision elements in
-its temporary URDF with bounded box proxies. Joint origins, limits, inertials,
-fixed mounts, tool primitives, TCP, and ROS frames still come from the expanded
-vendor/project description. Gazebo and MoveIt retain the original meshes. This
-is sufficient for Phase 00 articulation and ROS-path proof, but not for Genesis
-collision-fidelity claims.
+Genesis 1.3.3's legacy URDF parser reports decoder failures for named elements
+inside some Doosan collision DAE files. Disabling convexification also makes
+high-polygon collision preprocessing unacceptably slow. Neither issue requires
+discarding the visual meshes: the full M1013 model builds in roughly five
+seconds when visual geometry is retained and collision processing is bounded.
+
+The bridge now keeps the original Doosan and DFL Picker visual assets. It
+converts only DAE collision meshes to content-addressed STL files in the
+Genesis cache, then asks Genesis to decimate and convexify those files. Joint
+origins, limits, inertials, fixed mounts, TCP, and ROS frames still come from
+the expanded description. Picker base/tool collisions remain conservative
+primitives, so Phase 00 does not make contact- or clearance-fidelity claims.
 
 This decision does not claim vendor-control equivalence. Doosan safety logic,
 DRFL services, torque/force sensing, real tool I/O, and emulator-specific state
@@ -40,18 +44,18 @@ contacts and emulator state consistent.
 ## Measured Phase 00 behavior
 
 - All 12 Genesis robot/tool cases passed joint motion and the measured 20 mm
-  relative-TCP probe. Relative position errors were 0.32–3.82 mm against the
+  relative-TCP probe. Relative position errors were 1.31–3.68 mm against the
   4 mm gate.
 - The first cold-cache measurements took 122.8–127.7 seconds per process. With
-  the generated kernels cached, the final matrix took 18.1–19.3 seconds per
-  fresh simulator process on the recorded host.
+  generated kernels and collision conversions cached, the detailed-mesh matrix
+  took 21.1–35.4 seconds per fresh simulator process on the recorded host.
 - A 200-step M1013/Picker sample sustained 128.1 updates per second. PyTorch
   reported 8.2 MiB allocated and 22.0 MiB reserved after the sample.
 - Each matrix case starts from a fresh simulator process. Process restart is the
   Phase 00 reset boundary; no task-visible generalized reset service is claimed.
 - Cancellation holds the measured articulation target. Tool feedback remains
   explicitly commanded rather than measured, and contact/force usefulness is
-  not claimed with proxy geometry.
+  not claimed from simplified collision geometry.
 - The direct bridge's position gains are set high enough to keep the heavier
   H2515 inside the shared TCP-position gate under simulated gravity. They are
   simulator control parameters, not real-robot tuning values.

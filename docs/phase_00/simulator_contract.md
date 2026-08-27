@@ -36,8 +36,11 @@ task computes its relative target and numerical position IK from the selected
 expanded URDF, then recomputes TCP position from measured joint state; action
 success alone cannot satisfy the relative-motion gate.
 
-The Genesis bridge preserves vendor joint geometry, inertials, frames, and the
-project tool primitives, but substitutes boxes for upstream DAE mesh elements
-because Genesis 1.3.3 cannot decode those assets. Use Gazebo/MoveIt for the
-vendor collision meshes. Genesis contact, clearance, or force results are not
-qualification evidence in Phase 00.
+The Genesis bridge preserves the full Doosan and DFL Picker visual meshes,
+joint geometry, inertials, frames, and tool primitives. Genesis 1.3.3's legacy
+URDF parser is unreliable for named elements in some collision DAE files, so
+the bridge converts only DAE collision meshes to content-addressed cached STL;
+Genesis then decimates and convexifies those collision assets. Base and tool
+collision boundaries remain the declared conservative primitives. Genesis
+contact, clearance, or force results are therefore not qualification evidence
+in Phase 00.
